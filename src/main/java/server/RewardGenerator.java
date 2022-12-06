@@ -1,6 +1,6 @@
 package server;
 
-public class RewardGenerator implements Runnable {
+public class RewardGenerator {
 
     private final int D;
 
@@ -8,12 +8,7 @@ public class RewardGenerator implements Runnable {
         this.D = D;
     }
 
-    private void generateRewards() {
+    private static void generateRewards() {
         //TODO
-    }
-
-    @Override
-    public void run() {
-
     }
 }

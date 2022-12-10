@@ -14,11 +14,18 @@ public class ClientHandler implements Runnable {
     private final Socket clientSocket;
     private final ServerFacade facade;
 
+    private User currentUser;
+
+    public void setCurrentUser(User user) {
+        currentUser = user;
+    }
+
     private static final Map<Class<? extends Message>, IMessageHandler> handlers = new HashMap<>();
 
     public ClientHandler(ServerFacade facade, Socket clientSocket) {
         this.facade = facade;
         this.clientSocket = clientSocket;
+        this.currentUser = null;
     }
 
     public static void registerHandler(Class<? extends Message> messageClass, IMessageHandler handler) {
@@ -40,19 +47,22 @@ public class ClientHandler implements Runnable {
             do {
                 System.out.println("Aqui");
                 curMessage = Message.deserialize(in);
-                if(curMessage != null) {
+                if (curMessage != null) {
                     Message response = processMessage(curMessage);
+                    System.out.println(currentUser);
                     response.serialize(out);
                     out.flush();
                 }
-            } while(curMessage != null);
-        } catch(IOException e) {
-            System.out.println(e.toString());
+            } while (curMessage != null);
+        } catch(EOFException e) {
+            return; //Client closed, terminate normally
+        }catch(IOException e) {
+            System.out.println(e);
         }
     }
 
     private Message processMessage(Message message) {
         System.out.println(message.getClass());
-        return handlers.get(message.getClass()).processMessage(facade, message);
+        return handlers.get(message.getClass()).processMessage(facade, message, this::setCurrentUser);
     }
 }

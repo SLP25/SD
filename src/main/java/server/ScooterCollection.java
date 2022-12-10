@@ -27,13 +27,14 @@ public class ScooterCollection {
 
     public Scooter getClosestFreeScooter(Location l, int maxDistance) {
         lock.readLock().lock();
+        Scooter sc = null;
         try {
-            Scooter sc = unsafeGetClosestScooter(l, maxDistance);
-
-            if(sc == null) {
-                return null;
-            } else {
+            sc = unsafeGetClosestScooter(l, maxDistance);
+            sc.lock();
+            try {
                 return new Scooter(sc);
+            } finally {
+                sc.unlock();
             }
         } finally {
             lock.readLock().unlock();

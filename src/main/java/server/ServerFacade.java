@@ -17,13 +17,8 @@ public class ServerFacade {
         return users.loginUser(username, password);
     }
 
-    public boolean register(String username, String password) {
-        try {
-            users.registerUser(username, password);
-            return true;
-        } catch(RuntimeException e) { //TODO:: Change exception
-            return false;
-        }
+    public User register(String username, String password) {
+        return users.registerUser(username, password);
     }
 
 

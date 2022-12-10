@@ -87,6 +87,5 @@ public class ClassLoader {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Class not found " + className);
         }
-        return null;
     }
 }

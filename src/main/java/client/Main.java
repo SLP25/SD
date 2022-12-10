@@ -1,15 +1,10 @@
 package client;
 
 import common.ClassLoader;
-import common.User;
-import common.messages.LoginRequest;
-import common.messages.Message;
-import common.messages.LoginResponse;
-import sun.rmi.runtime.Log;
+import common.messages.*;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 
 /**
@@ -31,13 +26,13 @@ public class Main {
                 DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
                 DataInputStream in = new DataInputStream(clientSocket.getInputStream());
         ) {
-            LoginRequest request = new LoginRequest("vasques", "password12342");
+            RegistrationRequest request = new RegistrationRequest("batata", "password1234");
             request.serialize(out);
             out.flush();
 
             Message response = Message.deserialize(in);
             System.out.println("Resposta obtida");
-            LoginResponse lr = (LoginResponse)response;
+            RegistrationResponse lr = (RegistrationResponse)response;
             System.out.println(lr.getUser());
         } catch(IOException e) {
             System.out.println(e.toString());

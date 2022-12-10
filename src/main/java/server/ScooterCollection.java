@@ -12,6 +12,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
+
 public class ScooterCollection {
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();

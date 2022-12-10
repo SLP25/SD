@@ -21,12 +21,13 @@ public class LoginRequestHandler implements IMessageHandler {
      * Method responsible for processing the request and computing the response of the server
      * @param facade the facade of the server
      * @param message the incoming request
+     * @param user the current user
      * @param setUser a method used to set the user who made the request. Useful to set the current user on
      *                login requests
      * @return the appropriate response
      */
     @Override
-    public Message processMessage(ServerFacade facade, Message message, Consumer<User> setUser) {
+    public Message processMessage(ServerFacade facade, Message message, User user, Consumer<User> setUser) {
         if(!(message instanceof LoginRequest)) //TODO:: Change exception
             throw new RuntimeException("Cannot process messages other than login requests");
 

@@ -82,29 +82,30 @@ public class ScooterCollection {
     }
     public Set<Scooter> getFreeScootersWithinDistance(Location l, int distance) {
 
-        Set<Scooter> ans = new TreeSet<>();
+        //Set of scooters to lock
+        Set<Scooter> ls = new TreeSet<>();
+
 
         lock.readLock().lock();
-        try {
-            for(Map.Entry<Location, TreeSet<Scooter>> entry : freeScooters.entrySet()) {
-                int d = Location.distance(l, entry.getKey());
-                if(d <= distance) {
-                    for(Scooter sc : entry.getValue()) {
-                        sc.lock();
-                    }
 
-                    try {
-                        ans.addAll(entry.getValue());
-                    } finally {
-                        for(Scooter sc : entry.getValue()) {
-                            sc.unlock();
-                        }
-                    }
+        for(Map.Entry<Location, TreeSet<Scooter>> entry : freeScooters.entrySet()) {
+            int d = Location.distance(l, entry.getKey());
+            if(d <= distance) {
+                for(Scooter sc : entry.getValue()) {
+                    ls.add(sc);
                 }
             }
-        } finally {
-            lock.readLock().unlock();
         }
+
+        for(Scooter sc : ls)
+            sc.lock();
+
+        lock.readLock().unlock();
+        //Set of scooters to return
+        Set<Scooter> ans = ls.stream().map(s -> new Scooter(s)).collect(Collectors.toSet());
+
+        for(Scooter sc : ls)
+            sc.unlock();
 
         return ans;
     }

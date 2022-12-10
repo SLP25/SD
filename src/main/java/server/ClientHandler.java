@@ -63,6 +63,6 @@ public class ClientHandler implements Runnable {
 
     private Message processMessage(Message message) {
         System.out.println(message.getClass());
-        return handlers.get(message.getClass()).processMessage(facade, message, this::setCurrentUser);
+        return handlers.get(message.getClass()).processMessage(facade, message, this.currentUser, this::setCurrentUser);
     }
 }

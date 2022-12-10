@@ -131,4 +131,9 @@ public final class Location implements Comparable<Location> {
 
         return y - l.getY();
     }
+
+    @Override
+    public String toString() {
+        return String.format("(%d,%d)", x, y);
+    }
 }

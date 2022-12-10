@@ -1,6 +1,10 @@
 package server;
 
 import common.User;
+import common.Scooter;
+import common.Location;
+
+import java.util.Set;
 
 public class ServerFacade {
     private final RewardCollection rewards;
@@ -19,6 +23,10 @@ public class ServerFacade {
 
     public User register(String username, String password) {
         return users.registerUser(username, password);
+    }
+
+    public Set<Scooter> getFreeScootersInDistance(Location location, int maxDistance) {
+        return scooters.getFreeScootersWithinDistance(location, maxDistance);
     }
 
 

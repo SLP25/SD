@@ -107,9 +107,13 @@ public class UserCollection {
 
     /**
      * Auxiliary method of {@link, #seedData()}. Processes a single line of the file
-     * containing the users
-     * @param line
-     * @throws IOException
+     * containing the users.
+     *
+     * A line should have the format "username:password". Anything else will be deemed
+     * invalid.
+     *
+     * @param line a line of the text file
+     * @throws IOException if the line is not valid
      */
     private void processFileLine(String line) throws IOException {
         String[] split = line.split(":");

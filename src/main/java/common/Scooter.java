@@ -163,4 +163,10 @@ public class Scooter extends Lockable implements Comparable<Scooter> {
     public Object clone() {
         return new Scooter(this);
     }
+
+    @Override
+    public String toString() {
+        return String.format("Id: %d, Location: %s, User: %s", id, location.toString(), user == null ? "null" :
+                user.toString());
+    }
 }

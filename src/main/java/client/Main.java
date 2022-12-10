@@ -1,7 +1,9 @@
 package client;
 
 import common.ClassLoader;
+import common.Location;
 import common.messages.*;
+import common.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -34,6 +36,19 @@ public class Main {
             System.out.println("Resposta obtida");
             RegistrationResponse lr = (RegistrationResponse)response;
             System.out.println(lr.getUser());
+
+            FreeScootersWithinDistanceRequest fswdr = new FreeScootersWithinDistanceRequest(new Location(10, 10), 100);
+            fswdr.serialize(out);
+            out.flush();
+
+            response = Message.deserialize(in);
+            System.out.println("Resposta obtida");
+
+            FreeScootersWithinDistanceResponse fs = (FreeScootersWithinDistanceResponse)response;
+            System.out.println(fs.getScooters().size());
+            for(Scooter s : fs.getScooters()) {
+                System.out.println(s.toString());
+            }
         } catch(IOException e) {
             System.out.println(e.toString());
         }

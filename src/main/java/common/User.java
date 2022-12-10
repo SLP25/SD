@@ -97,4 +97,9 @@ public class User extends Lockable {
     public Object clone() {
         return new User(this);
     }
+
+    @Override
+    public String toString() {
+        return username;
+    }
 }

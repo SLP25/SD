@@ -9,7 +9,7 @@ public class ServerFacade {
 
     public ServerFacade() {
         rewards = new RewardCollection();
-        scooters = new ScooterCollection();
+        scooters = new ScooterCollection(20, 20);
         users = new UserCollection();
     }
 
@@ -17,12 +17,12 @@ public class ServerFacade {
         return users.loginUser(username, password) != null;
     }
 
-    public void register(String username, String password) {
+    public boolean register(String username, String password) {
         try {
             users.registerUser(username, password);
-        } catch(RuntimeException e) {
-            //Silence exception. The user can't know that registration failed
-            //because of a taken username, as to avoid user enumeration attacks
+            return true;
+        } catch(RuntimeException e) { //TODO:: Change exception
+            return false;
         }
     }
 

@@ -33,8 +33,8 @@ public class ClientHandler implements Runnable {
     public void run() {
 
         try (
-                ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream((clientSocket.getInputStream()));
+                DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
+                DataInputStream in = new DataInputStream((clientSocket.getInputStream()));
         ) {
             Message curMessage = null;
             do {

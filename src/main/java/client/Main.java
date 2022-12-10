@@ -4,9 +4,7 @@ import common.messages.LoginRequest;
 import common.messages.Message;
 import sun.rmi.runtime.Log;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -17,8 +15,8 @@ public class Main {
 
         try (
                 Socket clientSocket = new Socket("127.0.0.1", 20023);
-                ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+                DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
+                DataInputStream in = new DataInputStream(clientSocket.getInputStream());
         ) {
             LoginRequest request = new LoginRequest("vasques", "password1234");
             request.serialize(out);

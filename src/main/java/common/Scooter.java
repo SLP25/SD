@@ -3,10 +3,10 @@ package common;
 import java.io.*;
 
 /**
- * A scooter. Scooters can be placed accross the grid and
+ * A scooter. Scooters can be placed across the grid and
  * be reserved / moved by users.
  */
-public class Scooter extends Lockable {
+public class Scooter extends Lockable implements Comparable<Scooter> {
 
     /**
      * The unique identifier of the scooter
@@ -51,7 +51,6 @@ public class Scooter extends Lockable {
 
     /**
      * Copy constructor.
-     *
      * Creates a deep copy of the given scooter
      * @param scooter the scooter to copy
      */
@@ -147,7 +146,6 @@ public class Scooter extends Lockable {
 
     /**
      * Compares the given scooter with the current one.
-     *
      * A scooter is greater than another if and only if its identifier is greater
      *
      * @param sc the scooter to compare to
@@ -155,5 +153,14 @@ public class Scooter extends Lockable {
      */
     public int compareTo(Scooter sc) {
         return this.getId() - sc.getId();
+    }
+
+    /**
+     * Creates a deep copy of the current object
+     * @return a deep copy of the current object
+     */
+    @Override
+    public Object clone() {
+        return new Scooter(this);
     }
 }

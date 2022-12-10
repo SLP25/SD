@@ -20,7 +20,7 @@ import java.io.*;
  * Objects of this class are immutable, meaning no mutual exclusion
  * mechanism is needed.
  */
-public final class Location {
+public final class Location implements Comparable<Location> {
     /**
      * The x coordinate of the cell
      *

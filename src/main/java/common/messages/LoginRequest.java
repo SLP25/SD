@@ -26,6 +26,10 @@ public class LoginRequest extends Message {
      */
     private String password;
 
+    public LoginRequest() {
+        username = "";
+        password = "";
+    }
     /**
      * Default constructor
      * @param username the username to login as

@@ -1,5 +1,6 @@
 package client;
 
+import common.ClassLoader;
 import common.User;
 import common.messages.LoginRequest;
 import common.messages.Message;
@@ -9,12 +10,22 @@ import sun.rmi.runtime.Log;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
+/**
+ * Main client entry point
+ */
 public class Main {
+    /**
+     * Main client entry point
+     *
+     * @params args Ignored
+     */
     public static void main(String[] args) {
         //magia negra do felicio
 
-        LoginResponse lr1 = new LoginResponse(new User("", ""));
+        ClassLoader.loadClasses(Message.class.getPackage().getName(),
+                Arrays.asList(new String[]{"Message", "Exception"}));
         try (
                 Socket clientSocket = new Socket("127.0.0.1", 20023);
                 DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());

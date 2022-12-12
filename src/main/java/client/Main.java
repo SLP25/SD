@@ -59,8 +59,19 @@ public class Main {
 
             System.out.println(rsrr.getReservationCode());
             System.out.println(rsrr.getLocation().toString());
+
+            Thread.sleep(5000);
+            EndReservationRequest err = new EndReservationRequest( new Location(0,0),rsrr.getReservationCode());
+            err.serialize(out);
+            out.flush();
+
+            response = Message.deserialize(in);
+            EndReservationResponse errr = (EndReservationResponse)response;
+            System.out.println(errr.getCost());
         } catch(IOException e) {
             System.out.println(e.toString());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }

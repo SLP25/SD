@@ -11,10 +11,10 @@ import java.util.function.Consumer;
 /**
  * A class implementing a handler for {@link, common.messages.RegistrationRequest}
  */
-public class ReserveScooterRequestHandler implements IMessageHandler {
+public class EndReservationRequestHandler implements IMessageHandler {
     //Register the class in the super class, as to allow for deserialization
     static {
-        ClientHandler.registerHandler(ReserveScooterRequest.class, new ReserveScooterRequestHandler());
+        ClientHandler.registerHandler(EndReservationRequest.class, new EndReservationRequestHandler());
     }
 
     /**
@@ -28,14 +28,14 @@ public class ReserveScooterRequestHandler implements IMessageHandler {
      */
     @Override
     public Message processMessage(ServerFacade facade, Message message, User user, Consumer<User> setUser) {
-        if(!(message instanceof ReserveScooterRequest)) //TODO:: Change exception
+        if(!(message instanceof EndReservationRequest)) //TODO:: Change exception
             throw new RuntimeException("Cannot process messages other than registration requests");
 
-        ReserveScooterRequest request = (ReserveScooterRequest)message;
+        EndReservationRequest request = (EndReservationRequest) message;
 
-        Reservation r = facade.reserveScooter(user.getUsername(), request.getLocation(), request.getMaxDistance());
+        int cost = facade.endReservation(request.getReservationCode(), request.getLocation());
 
-        ReserveScooterResponse response = new ReserveScooterResponse(r.getStartLocation(), r.getId());
+        EndReservationResponse response = new EndReservationResponse(cost);
         return response;
     }
 }

@@ -82,6 +82,31 @@ public class ServerFacade {
         return ans;
     }
 
+    public int endReservation(int id, Location location) {
+        int cost = -1;
+        reservations.readLock().lock();
+        Reservation r = reservations.getReservation(id);
+        if(r != null) {
+            r.lock();
+            scooters.readLock().lock();
+            Scooter sc = scooters.getScooter(r.getScooterId());
+
+            if(sc != null) {
+                sc.lock();
+                sc.free(location);
+                r.terminate(location);
+                cost = r.getCost();
+                sc.unlock();
+            }
+
+            r.unlock();
+        }
+
+
+        reservations.readLock().unlock();
+        return cost;
+    }
+
     public void generateRewards() {
 
     }

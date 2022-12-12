@@ -31,8 +31,6 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         loadClasses();
-
-        LoginRequestHandler handler = new LoginRequestHandler();
         Server server = new Server();
         server.start(20023);
     }

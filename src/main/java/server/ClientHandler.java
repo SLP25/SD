@@ -1,5 +1,6 @@
 package server;
 
+import common.TaggedConnection;
 import common.User;
 import common.messages.Message;
 import server.messageHandling.IMessageHandler;
@@ -11,7 +12,7 @@ import java.util.Map;
 
 public class ClientHandler implements Runnable {
 
-    private final Socket clientSocket;
+    private final Socket socket;
     private final ServerFacade facade;
 
     private User currentUser;
@@ -22,9 +23,9 @@ public class ClientHandler implements Runnable {
 
     private static final Map<Class<? extends Message>, IMessageHandler> handlers = new HashMap<>();
 
-    public ClientHandler(ServerFacade facade, Socket clientSocket) {
+    public ClientHandler(ServerFacade facade, Socket clientSocket) throws IOException {
         this.facade = facade;
-        this.clientSocket = clientSocket;
+        this.socket = clientSocket;
         this.currentUser = null;
     }
 
@@ -39,30 +40,28 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
 
+
         try (
-                DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
-                DataInputStream in = new DataInputStream((clientSocket.getInputStream()));
-        ) {
+            TaggedConnection conn = new TaggedConnection(socket)
+        ){
             Message curMessage = null;
             do {
-                System.out.println("Aqui");
-                curMessage = Message.deserialize(in);
+                TaggedConnection.Frame f = conn.receive();
+                curMessage = f.getMessage();
                 if (curMessage != null) {
                     Message response = processMessage(curMessage);
-                    System.out.println(currentUser);
-                    response.serialize(out);
-                    out.flush();
+                    conn.send(f.getTag(), response);
                 }
             } while (curMessage != null);
         } catch(EOFException e) {
             return; //Client closed, terminate normally
-        }catch(IOException e) {
+        } catch(IOException e) {
             System.out.println(e);
         }
     }
 
     private Message processMessage(Message message) {
-        System.out.println(message.getClass());
+        System.out.println(message);
         return handlers.get(message.getClass()).processMessage(facade, message, this.currentUser, this::setCurrentUser);
     }
 }

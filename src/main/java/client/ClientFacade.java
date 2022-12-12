@@ -1,8 +1,6 @@
 package client;
 
-import common.Location;
-import common.Scooter;
-import common.User;
+import common.*;
 import common.messages.*;
 import javafx.util.Pair;
 
@@ -16,75 +14,68 @@ import java.util.Set;
 public class ClientFacade implements AutoCloseable {
     private static final String ip = "127.0.0.1";
     private static final int port = 20023;
-    private Socket clientSocket;
-    private DataInputStream in;
-    private DataOutputStream out;
+    private Demultiplexer conn;
+
     public ClientFacade() throws IOException {
-        clientSocket = new Socket(ip, port);
-        out = new DataOutputStream(clientSocket.getOutputStream());
-        in = new DataInputStream(clientSocket.getInputStream());
+        Socket clientSocket = new Socket(ip, port);
+        conn = new Demultiplexer(new TaggedConnection(clientSocket));
+        conn.start();
     }
 
-    public User authenticate(String username, String password) throws IOException {
+    public User authenticate(String username, String password) throws IOException, InterruptedException {
         LoginRequest request = new LoginRequest(username, password);
 
-        request.serialize(out);
-        out.flush();
+        conn.send(1, request);
 
-        LoginResponse response = (LoginResponse)Message.deserialize(in);
+        LoginResponse response = (LoginResponse)conn.receive(1);
 
         return response.getUser();
     }
 
-    public User register(String username, String password) throws IOException {
+    public User register(String username, String password) throws IOException, InterruptedException {
         RegistrationRequest request = new RegistrationRequest(username, password);
 
-        request.serialize(out);
-        out.flush();
+        conn.send(1, request);
 
-        RegistrationResponse response = (RegistrationResponse)Message.deserialize(in);
-
+        RegistrationResponse response = (RegistrationResponse)conn.receive(1);
         return response.getUser();
     }
 
-    public Set<Scooter> getFreeScootersInDistance(Location location, int maxDistance) throws IOException {
+    public Set<Scooter> getFreeScootersInDistance(Location location, int maxDistance)
+            throws IOException, InterruptedException {
         FreeScootersWithinDistanceRequest request = new FreeScootersWithinDistanceRequest(location, maxDistance);
 
-        request.serialize(out);
-        out.flush();
+        conn.send(1, request);
 
-        FreeScootersWithinDistanceResponse response = (FreeScootersWithinDistanceResponse)Message.deserialize(in);
+        FreeScootersWithinDistanceResponse response = (FreeScootersWithinDistanceResponse)conn.receive(1);
 
         return response.getScooters();
     }
 
     //TODO:: Use reservation
-    public Pair<Integer, Location> reserveScooter(Location location, int maxDistance) throws IOException {
+    public Pair<Integer, Location> reserveScooter(Location location, int maxDistance)
+            throws IOException, InterruptedException {
         ReserveScooterRequest request = new ReserveScooterRequest(location, maxDistance);
 
-        request.serialize(out);
-        out.flush();
+        conn.send(1, request);
 
-        ReserveScooterResponse response = (ReserveScooterResponse) Message.deserialize(in);
+        ReserveScooterResponse response = (ReserveScooterResponse)conn.receive(1);
 
         return new Pair<>(response.getReservationCode(), response.getLocation());
     }
 
-    public int endReservation(int id, Location location) throws IOException {
+    public int endReservation(int id, Location location) throws IOException, InterruptedException {
         EndReservationRequest request = new EndReservationRequest(location, id);
 
-        request.serialize(out);
-        out.flush();
+        conn.send(1, request);
 
-        EndReservationResponse response = (EndReservationResponse) Message.deserialize(in);
+        EndReservationResponse response = (EndReservationResponse)conn.receive(1);
 
         return response.getCost();
     }
 
     @Override
     public void close() throws Exception {
-        out.close();
-        in.close();
-        clientSocket.close();
+        conn.close();
     }
 }

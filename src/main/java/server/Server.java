@@ -21,6 +21,7 @@ public class Server {
             Socket clientSocket = serverSocket.accept();
 
             //Process client in a different thread
+            //TODO:: Handle client exceptions gracefully
             new Thread(new ClientHandler(facade, clientSocket))
                     .start();
         }

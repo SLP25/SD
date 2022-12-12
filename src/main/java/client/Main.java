@@ -5,10 +5,12 @@ import common.Location;
 import common.messages.*;
 import common.*;
 import javafx.scene.SubScene;
+import javafx.util.Pair;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * Main client entry point
@@ -25,53 +27,25 @@ public class Main {
         ClassLoader.loadClasses(Message.class.getPackage().getName(),
                 Arrays.asList(new String[]{"Message", "Exception"}));
         try (
-                Socket clientSocket = new Socket("127.0.0.1", 20023);
-                DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
-                DataInputStream in = new DataInputStream(clientSocket.getInputStream());
+                ClientFacade facade = new ClientFacade();
         ) {
-            RegistrationRequest request = new RegistrationRequest("batata", "password1234");
-            request.serialize(out);
-            out.flush();
+            System.out.println(facade.authenticate("vasques", "password1234"));
+            System.out.println(facade.register("batata", "password1234"));
 
-            Message response = Message.deserialize(in);
-            System.out.println("Resposta obtida");
-            RegistrationResponse lr = (RegistrationResponse)response;
-            System.out.println(lr.getUser());
-
-            FreeScootersWithinDistanceRequest fswdr = new FreeScootersWithinDistanceRequest(new Location(10, 10), 100);
-            fswdr.serialize(out);
-            out.flush();
-
-            response = Message.deserialize(in);
-            System.out.println("Resposta obtida");
-
-            FreeScootersWithinDistanceResponse fs = (FreeScootersWithinDistanceResponse)response;
-            System.out.println(fs.getScooters().size());
-            for(Scooter s : fs.getScooters()) {
+            Set<Scooter> scooters = facade.getFreeScootersInDistance(new Location(10,10), 50);
+            System.out.println(scooters.size());
+            for(Scooter s : scooters) {
                 System.out.println(s.toString());
             }
 
-            ReserveScooterRequest rsr = new ReserveScooterRequest(new Location(10, 10), 50);
-            rsr.serialize(out);
-            out.flush();
-            response = Message.deserialize(in);
-            ReserveScooterResponse rsrr = (ReserveScooterResponse)response;
-
-            System.out.println(rsrr.getReservationCode());
-            System.out.println(rsrr.getLocation().toString());
+            Pair<Integer, Location> p = facade.reserveScooter(new Location(10, 10), 50);
+            System.out.println(p.getKey());
+            System.out.println(p.getValue());
 
             Thread.sleep(5000);
-            EndReservationRequest err = new EndReservationRequest( new Location(0,0),rsrr.getReservationCode());
-            err.serialize(out);
-            out.flush();
-
-            response = Message.deserialize(in);
-            EndReservationResponse errr = (EndReservationResponse)response;
-            System.out.println(errr.getCost());
-        } catch(IOException e) {
+            System.out.println(facade.endReservation(p.getKey(), new Location(0,0)));
+        } catch(Exception e) {
             System.out.println(e.toString());
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 }

@@ -7,12 +7,6 @@ import java.io.*;
  * be reserved / moved by users.
  */
 public class Scooter extends Lockable implements Comparable<Scooter> {
-
-    /**
-     * The unique identifier of the scooter
-     */
-    private final int id;
-
     /**
      * The current location of the scooter
      */
@@ -30,8 +24,7 @@ public class Scooter extends Lockable implements Comparable<Scooter> {
      * @param location the current location of the scooter
      */
     public Scooter(int id, Location location) {
-        super();
-        this.id = id;
+        super(id);
         this.location = location;
         this.user = null;
     }
@@ -43,8 +36,7 @@ public class Scooter extends Lockable implements Comparable<Scooter> {
      * @param user the user the scooter is allocated to
      */
     public Scooter(int id, Location location, User user) {
-        super();
-        this.id = id;
+        super(id);
         this.location = location;
         this.user = user;
     }
@@ -55,18 +47,9 @@ public class Scooter extends Lockable implements Comparable<Scooter> {
      * @param scooter the scooter to copy
      */
     public Scooter(Scooter scooter) {
-        super();
-        this.id = scooter.getId();
+        super(scooter.getId());
         this.location = scooter.getLocation();
         this.user = scooter.getUser();
-    }
-
-    /**
-     * Gets the unique identifier of the current scooter
-     * @return the unique identifier of the current scooter
-     */
-    public int getId() {
-        return id;
     }
 
     /**
@@ -119,7 +102,7 @@ public class Scooter extends Lockable implements Comparable<Scooter> {
      * @throws IOException if writing to the stream failed
      */
     public void serialize(DataOutputStream out) throws IOException {
-        out.writeInt(id);
+        out.writeInt(this.getId());
         location.serialize(out);
         out.writeBoolean(user != null);
         if(user != null)
@@ -166,7 +149,7 @@ public class Scooter extends Lockable implements Comparable<Scooter> {
 
     @Override
     public String toString() {
-        return String.format("Id: %d, Location: %s, User: %s", id, location.toString(), user == null ? "null" :
-                user.toString());
+        return String.format("Id: %d, Location: %s, User: %s", this.getId(), location.toString(),
+                user == null ? "null" : user.toString());
     }
 }

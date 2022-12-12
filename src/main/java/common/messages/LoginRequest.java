@@ -56,16 +56,16 @@ public class LoginRequest extends Message {
         return password;
     }
 
-    /**
-     * Deserializes an object from a DataInputStream
+   /**
+     * Serializes an object to a DataOutputStream
      *
-     * @param in the given DataInputStream
-     * @throws IOException if reading from the stream failed
+     * @param out the given DataOutputStream
+     * @throws IOException if writing to the stream failed
      */
     @Override
-    protected void serializeMessage(DataOutputStream stream) throws IOException {
-        stream.writeUTF(username);
-        stream.writeUTF(password);
+    protected void serializeMessage(DataOutputStream out) throws IOException {
+        out.writeUTF(username);
+        out.writeUTF(password);
     }
 
     /**
@@ -75,9 +75,9 @@ public class LoginRequest extends Message {
      * @throws IOException if reading from the stream failed
      */
     @Override
-    protected Message deserializeMessage(DataInputStream stream) throws IOException {
-        String user = stream.readUTF();
-        String pass = stream.readUTF();
+    protected Message deserializeMessage(DataInputStream in) throws IOException {
+        String user = in.readUTF();
+        String pass = in.readUTF();
 
         return new LoginRequest(user, pass);
     }

@@ -22,10 +22,20 @@ public abstract class Lockable {
     private Lock l;
 
     /**
+     * An identifier for the object
+     */
+    private final int id;
+
+    /**
      * Default constructor
      */
-    public Lockable() {
+    public Lockable(int id) {
         l = new ReentrantLock();
+        this.id = id;
+    }
+
+    public Lockable() {
+        this(-1);
     }
 
     /**
@@ -42,5 +52,13 @@ public abstract class Lockable {
      */
     public void unlock() {
         l.unlock();
+    }
+
+    /**
+     * Gets the identifier of the object
+     * @return the identifier of the object
+     */
+    public int getId() {
+        return id;
     }
 }

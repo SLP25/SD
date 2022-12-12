@@ -4,6 +4,7 @@ import common.ClassLoader;
 import common.Location;
 import common.messages.*;
 import common.*;
+import javafx.scene.SubScene;
 
 import java.io.*;
 import java.net.Socket;
@@ -49,6 +50,15 @@ public class Main {
             for(Scooter s : fs.getScooters()) {
                 System.out.println(s.toString());
             }
+
+            ReserveScooterRequest rsr = new ReserveScooterRequest(new Location(10, 10), 50);
+            rsr.serialize(out);
+            out.flush();
+            response = Message.deserialize(in);
+            ReserveScooterResponse rsrr = (ReserveScooterResponse)response;
+
+            System.out.println(rsrr.getReservationCode());
+            System.out.println(rsrr.getLocation().toString());
         } catch(IOException e) {
             System.out.println(e.toString());
         }

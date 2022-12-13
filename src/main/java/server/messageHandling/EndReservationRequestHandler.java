@@ -33,7 +33,7 @@ public class EndReservationRequestHandler implements IMessageHandler {
 
         EndReservationRequest request = (EndReservationRequest) message;
 
-        int cost = facade.endReservation(request.getReservationCode(), request.getLocation());
+        int cost = facade.endReservation(user.getUsername(), request.getReservationCode(), request.getLocation());
 
         EndReservationResponse response = new EndReservationResponse(cost);
         return response;

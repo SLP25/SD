@@ -1,8 +1,5 @@
 package server;
 
-import common.User;
-import common.messages.LoginRequest;
-import common.messages.LoginResponse;
 import common.messages.Message;
 import server.messageHandling.LoginRequestHandler;
 import common.ClassLoader;

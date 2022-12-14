@@ -1,14 +1,51 @@
 package server;
 
-public class RewardGenerator {
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-    private final int D;
+public class RewardGenerator implements Runnable {
+    private final Lock lock;
+    private final Condition condition;
 
-    public RewardGenerator(int D) {
-        this.D = D;
+    private boolean awake;
+
+    private int distance;
+
+    private final ServerFacade facade;
+    public RewardGenerator(ServerFacade facade, int d) {
+        this.awake = true;
+        this.facade = facade;
+        this.lock = new ReentrantLock();
+        this.condition = this.lock.newCondition();
+        distance = d;
     }
 
-    private static void generateRewards() {
-        //TODO
+    public void setAwake() {
+        lock.lock();
+        try {
+            awake = true;
+            condition.signal();
+        } finally {
+            lock.unlock();
+        }
+    }
+    @Override
+    public void run() {
+        while(true) {
+            lock.lock();
+
+            try {
+                while (!awake)
+                    condition.await();
+
+                facade.generateRewards(distance);
+
+                awake = false;
+            } catch(InterruptedException e) {
+            }finally {
+                lock.unlock();
+            }
+        }
     }
 }

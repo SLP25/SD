@@ -3,6 +3,9 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The main server wrapper class
@@ -18,11 +21,18 @@ public class Server {
      */
     private ServerFacade facade;
 
+    private Thread rewardThread;
+
+    private final RewardGenerator rewardGenerator;
+
     /**
      * Default constructor
      */
     public Server() {
         facade = new ServerFacade();
+        rewardGenerator = new RewardGenerator(facade, 40);
+        facade.setRunRewards(rewardGenerator::setAwake);
+
     }
 
     /**
@@ -31,6 +41,7 @@ public class Server {
      * @throws IOException if starting the socket fails
      */
     public void start(int port) throws IOException {
+        new Thread(rewardGenerator).start();
         serverSocket = new ServerSocket(port);
 
         while(true) {

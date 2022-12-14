@@ -3,13 +3,16 @@ package server;
 import common.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.locks.Condition;
 
 /**
  * The server facade. Exposes all the supported functionality
  */
 public class ServerFacade {
+    private static final int N = 20;
     /**
      * The collection of rewards
      */
@@ -30,6 +33,8 @@ public class ServerFacade {
      */
     private final UserCollection users;
 
+    private Runnable runRewards;
+
     /**
      * Default constructor
      *
@@ -37,9 +42,13 @@ public class ServerFacade {
      */
     public ServerFacade() {
         rewards = new RewardCollection();
-        scooters = new ScooterCollection(20, 20);
+        scooters = new ScooterCollection(N, 20);
         reservations = new ReservationCollection();
         users = new UserCollection();
+    }
+
+    public void setRunRewards(Runnable r) {
+        this.runRewards = r;
     }
 
     /**
@@ -126,12 +135,14 @@ public class ServerFacade {
         Reservation ans = new Reservation(reservations.getNumberReservations(),
                 sc.getId(), user, sc.getLocation(), LocalDateTime.now());
 
+        for(Scooter s : scooters.getScooters())
+            s.unlock();
+
         reservations.addReservation(ans);
 
         reservations.writeLock().unlock();
 
-        for(Scooter s : scooters.getScooters())
-            s.unlock();
+        runRewards.run();
 
         return ans;
     }
@@ -169,6 +180,9 @@ public class ServerFacade {
 
 
         reservations.readLock().unlock();
+
+        runRewards.run();
+
         return cost;
     }
 
@@ -177,7 +191,66 @@ public class ServerFacade {
      *
      * @see Reward
      */
-    public void generateRewards() {
+    //TODO:: Heavy optimization
+    public void generateRewards(int d) {
+        int[][] grid = new int[N][N];
+        for(int i = 0; i < N; i++)
+            for(int j = 0; j < N; j++)
+                grid[i][j] = 0;
 
+        Set<Location> emptyLocations = new TreeSet<>();
+        Set<Location> fullLocations = new TreeSet<>();
+        scooters.readLock().lock();
+        rewards.writeLock().lock();
+        for(Scooter sc : scooters.getScooters())
+            sc.lock();
+
+        for(Scooter sc : scooters.getScooters()) {
+            Location l = sc.getLocation();
+            grid[l.getX()][l.getY()]++;
+        }
+
+        for(int i = 0; i < N; i++) {
+            for(int j = 0; j < N; j++) {
+                if(grid[i][j] > 1) {
+                    fullLocations.add(new Location(i, j));
+                } else if(grid[i][j] == 0) {
+                    boolean empty = true;
+                    for(int h = -d; h <= d; h++) {
+                        for(int k = -(d - Math.abs(h)); k <= (d - Math.abs(h)); k++) {
+                            if(grid[i][j] != 0)
+                                empty = false;
+                        }
+                    }
+
+                    if(empty) {
+                        emptyLocations.add(new Location(i,j));
+                    }
+                }
+            }
+        }
+        Set<Reward> r = generateRewards(emptyLocations, fullLocations);
+
+        rewards.replaceAll(r);
+
+        //Ordem de libertar locks
+        for(Scooter sc : scooters.getScooters())
+            sc.unlock();
+        scooters.readLock().unlock();
+        rewards.writeLock().unlock();
+
+        System.out.println("Generated " + rewards.size() + " rewards");
+    }
+
+    private Set<Reward> generateRewards(Set<Location> emptyLocations, Set<Location> fullLocations) {
+        Set<Reward> ans = new HashSet<>();
+
+        for(Location x : emptyLocations) {
+            for(Location y : fullLocations) {
+                ans.add(new Reward(x, y));
+            }
+        }
+
+        return ans;
     }
 }

@@ -6,47 +6,31 @@ import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class RewardCollection {
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Set<Reward> rewards;
+public class RewardCollection extends LockableCollection {
+    private Set<Reward> rewards;
 
     public RewardCollection() {
         this.rewards = new HashSet<>();
     }
 
-    public void addReward(Reward reward) {
-        lock.writeLock().lock();
-
-        try {
-            rewards.add(reward);
-        } finally {
-            lock.writeLock().unlock();
+    public void replaceAll(Collection<Reward> rs) {
+        this.rewards = new HashSet<>();
+        for(Reward r : rs) {
+            this.rewards.add(new Reward(r));
         }
     }
 
-    public void removeReward(Reward reward) {
-        lock.writeLock().lock();
-
-        try {
-            rewards.remove(reward);
-        } finally {
-            lock.writeLock().unlock();
-        }
+    public int size() {
+        return rewards.size();
     }
 
     public Collection<Reward> getRewards() {
         Collection<Reward> result = new HashSet<>();
 
-        lock.readLock().lock();
-
-        try {
-            //This is thread safe because Reward is immutable
-            for(Reward r : rewards) {
-                result.add(r);
-            }
-        } finally {
-            lock.readLock().unlock();
+        for(Reward r : rewards) {
+            result.add(r);
         }
+
 
         return result;
     }

@@ -12,6 +12,10 @@ public final class Reward {
         this.endLocation = endLocation;
     }
 
+    public Reward(Reward r) {
+        this(r.getStartLocation(), r.getEndLocation());
+    }
+
     public Location getStartLocation() {
         return startLocation;
     }

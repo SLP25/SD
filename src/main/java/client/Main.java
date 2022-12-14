@@ -32,13 +32,13 @@ public class Main {
             System.out.println(facade.authenticate("vasques", "password1234"));
             System.out.println(facade.register("batata", "password1234"));
 
-            Set<Scooter> scooters = facade.getFreeScootersInDistance(new Location(10,10), 50);
+            Set<Scooter> scooters = facade.getFreeScootersInDistance(new Location(10,10));
             System.out.println(scooters.size());
             for(Scooter s : scooters) {
                 System.out.println(s.toString());
             }
 
-            Pair<Integer, Location> p = facade.reserveScooter(new Location(10, 10), 50);
+            Pair<Integer, Location> p = facade.reserveScooter(new Location(10, 10));
             System.out.println(p.getKey());
             System.out.println(p.getValue());
 

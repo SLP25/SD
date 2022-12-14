@@ -34,7 +34,7 @@ public class FreeScootersWithinDistanceRequestHandler implements IMessageHandler
         //TODO:: Check authentication
         FreeScootersWithinDistanceRequest request = (FreeScootersWithinDistanceRequest)message;
 
-        Set<Scooter> ans = facade.getFreeScootersInDistance(request.getLocation(), request.getMaxDistance());
+        Set<Scooter> ans = facade.getFreeScootersInDistance(request.getLocation());
 
         System.out.println(ans.size());
         FreeScootersWithinDistanceResponse response = new FreeScootersWithinDistanceResponse(ans);

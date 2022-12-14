@@ -23,26 +23,18 @@ public class FreeScootersWithinDistanceRequest extends Message {
     private Location location;
 
     /**
-     * The maximum distance from the location
-     */
-    private int maxDistance;
-
-    /**
      * Default constructor
      */
     public FreeScootersWithinDistanceRequest() {
         location = null;
-        maxDistance = 0;
     }
 
     /**
      * Parameterized constructor
      * @param l the location to be the center of the search
-     * @param distance the maximum distance from the location
      */
-    public FreeScootersWithinDistanceRequest(Location l, int distance) {
+    public FreeScootersWithinDistanceRequest(Location l) {
         this.location = l;
-        this.maxDistance = distance;
     }
 
     /**
@@ -51,14 +43,6 @@ public class FreeScootersWithinDistanceRequest extends Message {
      */
     public Location getLocation() {
         return location;
-    }
-
-    /**
-     * Gets the maximum distance from the location
-     * @return the maximum distance from the location
-     */
-    public int getMaxDistance() {
-        return maxDistance;
     }
 
     /**
@@ -72,7 +56,6 @@ public class FreeScootersWithinDistanceRequest extends Message {
     @Override
     protected void serializeMessage(DataOutputStream out) throws IOException {
         location.serialize(out);
-        out.writeInt(maxDistance);
     }
 
     /**
@@ -84,8 +67,7 @@ public class FreeScootersWithinDistanceRequest extends Message {
     @Override
     protected Message deserializeMessage(DataInputStream in) throws IOException {
         Location l = Location.deserialize(in);
-        int distance = in.readInt();
 
-        return new FreeScootersWithinDistanceRequest(l, distance);
+        return new FreeScootersWithinDistanceRequest(l);
     }
 }

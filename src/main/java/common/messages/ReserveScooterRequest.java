@@ -19,11 +19,6 @@ public class ReserveScooterRequest extends Message {
     }
 
     /**
-     * The maximum distance the scooter must be of the given location
-     */
-    private int maxDistance;
-
-    /**
      * The location of the request
      */
     private Location location;
@@ -32,17 +27,14 @@ public class ReserveScooterRequest extends Message {
      * Default constructor
      */
     public ReserveScooterRequest() {
-        maxDistance = 0;
         location = new Location(0,0);
     }
     /**
      * Parameterized constructor
      * @param l the location of the request
-     * @param d the maximum distance the scooter must be of the given location
      */
-    public ReserveScooterRequest(Location l, int d) {
+    public ReserveScooterRequest(Location l) {
         location = l;
-        maxDistance = d;
     }
 
     /**
@@ -53,13 +45,6 @@ public class ReserveScooterRequest extends Message {
         return location;
     }
 
-    /**
-     * Gets the maximum distance the scooter must be of the given location
-     * @return the maximum distance the scooter must be of the given location
-     */
-    public int getMaxDistance() {
-        return maxDistance;
-    }
 
     /**
      * Serializes an object to a DataOutputStream
@@ -70,7 +55,6 @@ public class ReserveScooterRequest extends Message {
     @Override
     protected void serializeMessage(DataOutputStream out) throws IOException {
         location.serialize(out);
-        out.writeInt(maxDistance);
     }
 
     /**
@@ -82,8 +66,7 @@ public class ReserveScooterRequest extends Message {
     @Override
     protected Message deserializeMessage(DataInputStream in) throws IOException {
         Location l = Location.deserialize(in);
-        int d = in.readInt();
 
-        return new ReserveScooterRequest(l, d);
+        return new ReserveScooterRequest(l);
     }
 }

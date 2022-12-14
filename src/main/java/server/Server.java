@@ -34,8 +34,8 @@ public class Server {
     /**
      * Default constructor
      */
-    public Server() {
-        facade = new ServerFacade();
+    public Server(int n, int d, int scooterCount) {
+        facade = new ServerFacade(n, d, scooterCount);
         rewardGenerator = new RewardGenerator(facade, 40);
         facade.setRunRewards(rewardGenerator::setAwake);
 

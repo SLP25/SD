@@ -14,7 +14,13 @@ public class ServerFacade {
     /**
      * The size of the grid
      */
-    private static final int N = 20;
+    private static int N;
+
+    /**
+     * The size of the grid
+     */
+    private static int D;
+
     /**
      * The collection of rewards
      */
@@ -44,10 +50,16 @@ public class ServerFacade {
      * Default constructor
      *
      * @implNote initializes all users and scooters with test data
+     *
+     * @param n the size of the grid
+     * @param d the maximum distance in queries
+     * @param scooterCount the number of scooters in the server
      */
-    public ServerFacade() {
+    public ServerFacade(int n, int d, int scooterCount) {
+        N = n;
+        D = d;
         rewards = new RewardCollection();
-        scooters = new ScooterCollection(N, 20);
+        scooters = new ScooterCollection(N, scooterCount);
         reservations = new ReservationCollection();
         users = new UserCollection();
     }
@@ -90,10 +102,9 @@ public class ServerFacade {
      * Gets all free scooters within a certain distance of the given location
      *
      * @param location the location to center the search around
-     * @param maxDistance the maximum distance a scooter can be of the given location
      * @return all free scooters within a certain distance of the given location
      */
-    public Set<Scooter> getFreeScootersInDistance(Location location, int maxDistance) {
+    public Set<Scooter> getFreeScootersInDistance(Location location) {
         Set<Scooter> ans = new TreeSet<>();
 
         scooters.readLock().lock();
@@ -103,7 +114,7 @@ public class ServerFacade {
         scooters.readLock().unlock();
 
         for(Scooter s : scooters.getScooters()) {
-            if(Location.distance(s.getLocation(), location) <= maxDistance)
+            if(Location.distance(s.getLocation(), location) <= D)
                 ans.add(new Scooter(s));
 
             s.unlock();
@@ -119,17 +130,16 @@ public class ServerFacade {
      *
      * @param user the user who wants to reserve the scooter
      * @param location the location to center the search in
-     * @param maxDistance the maximum distance between the scooter and the given location
      * @return the reservation of the scooter
      */
-    public Reservation reserveScooter(String user, Location location, int maxDistance) {
+    public Reservation reserveScooter(String user, Location location) {
 
         scooters.readLock().lock();
         for(Scooter s : scooters.getScooters())
             s.lock();
 
         Scooter sc = null;
-        int distance = maxDistance + 1;
+        int distance = D + 1;
         for(Scooter s : scooters.getScooters()) {
             int d = Location.distance(s.getLocation(), location);
             if(d < distance) {

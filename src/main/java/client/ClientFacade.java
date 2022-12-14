@@ -81,14 +81,13 @@ public class ClientFacade implements AutoCloseable {
      * Gets all free scooters within a certain distance of the given location
      *
      * @param location the location to center the search around
-     * @param maxDistance the maximum distance a scooter can be of the given location
      * @return all free scooters within a certain distance of the given location
      * @throws IOException if connecting with the server failed
      * @throws InterruptedException if the thread is interrupted
      */
-    public Set<Scooter> getFreeScootersInDistance(Location location, int maxDistance)
+    public Set<Scooter> getFreeScootersInDistance(Location location)
             throws IOException, InterruptedException {
-        FreeScootersWithinDistanceRequest request = new FreeScootersWithinDistanceRequest(location, maxDistance);
+        FreeScootersWithinDistanceRequest request = new FreeScootersWithinDistanceRequest(location);
 
         conn.send(1, request);
 
@@ -104,14 +103,13 @@ public class ClientFacade implements AutoCloseable {
      * @implNote the reservation returned is a deep copy of the one stored in the facade
      *
      * @param location the location to center the search in
-     * @param maxDistance the maximum distance between the scooter and the given location
      * @return the reservation code and the location of the scooter
      * @throws IOException if connecting with the server failed
      * @throws InterruptedException if the thread is interrupted
      */
-    public Pair<Integer, Location> reserveScooter(Location location, int maxDistance)
+    public Pair<Integer, Location> reserveScooter(Location location)
             throws IOException, InterruptedException {
-        ReserveScooterRequest request = new ReserveScooterRequest(location, maxDistance);
+        ReserveScooterRequest request = new ReserveScooterRequest(location);
 
         conn.send(1, request);
 

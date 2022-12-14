@@ -33,7 +33,7 @@ public class ReserveScooterRequestHandler implements IMessageHandler {
 
         ReserveScooterRequest request = (ReserveScooterRequest)message;
 
-        Reservation r = facade.reserveScooter(user.getUsername(), request.getLocation(), request.getMaxDistance());
+        Reservation r = facade.reserveScooter(user.getUsername(), request.getLocation());
 
         ReserveScooterResponse response = new ReserveScooterResponse(r.getStartLocation(), r.getId());
         return response;

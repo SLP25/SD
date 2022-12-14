@@ -21,8 +21,14 @@ public class Server {
      */
     private ServerFacade facade;
 
+    /**
+     * The thread responsible for generating rewards
+     */
     private Thread rewardThread;
 
+    /**
+     * Instance responsible for generating rewards
+     */
     private final RewardGenerator rewardGenerator;
 
     /**

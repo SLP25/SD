@@ -6,12 +6,14 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.locks.Condition;
 
 /**
  * The server facade. Exposes all the supported functionality
  */
 public class ServerFacade {
+    /**
+     * The size of the grid
+     */
     private static final int N = 20;
     /**
      * The collection of rewards
@@ -33,6 +35,9 @@ public class ServerFacade {
      */
     private final UserCollection users;
 
+    /**
+     * The method used to trigger the generation of new rewards
+     */
     private Runnable runRewards;
 
     /**
@@ -47,6 +52,10 @@ public class ServerFacade {
         users = new UserCollection();
     }
 
+    /**
+     * Sets the method used to trigger reward generation
+     * @param r the method used to trigger reward generation
+     */
     public void setRunRewards(Runnable r) {
         this.runRewards = r;
     }
@@ -247,7 +256,7 @@ public class ServerFacade {
 
         for(Location x : emptyLocations) {
             for(Location y : fullLocations) {
-                ans.add(new Reward(x, y));
+                ans.add(new Reward(x, y, 69420));
             }
         }
 

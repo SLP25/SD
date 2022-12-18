@@ -180,7 +180,6 @@ public class ServerFacade {
      *
      * @see Reward
      */
-    //TODO:: Heavy optimization
     public void generateRewards(int d) {
         //We use lists because having order will be useful in the end
         //when we randomly pick the index of the end location of a reward
@@ -216,6 +215,15 @@ public class ServerFacade {
         }
     }
 
+    /**
+     * Generates the rewards given the list of empty and full locations
+     *
+     * Only one reward per full location will be generated, for performance reasons
+     *
+     * @param emptyLocations the locations where there are no scooters in range
+     * @param fullLocations the locations where there are multiple scooters parked
+     * @return the set of generated rewards
+     */
     private Set<Reward> generateRewards(List<Location> emptyLocations, List<Location> fullLocations) {
         Set<Reward> ans = new HashSet<>();
         Random rnd = new Random();

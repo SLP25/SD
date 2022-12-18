@@ -10,7 +10,14 @@ import java.io.DataOutputStream;
  * @implNote It is an immutable class
  */
 public final class Reward {
+    /**
+     * The minimum monetary value of a reward
+     */
     public static final int minimumPrize = 10000;
+
+    /**
+     * The maximum monetary value of a reward
+     */
     public static final int maximumPrize = 10000;
     /**
      * The start location

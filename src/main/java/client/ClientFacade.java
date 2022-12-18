@@ -6,6 +6,7 @@ import javafx.util.Pair;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Map;
 import java.util.Set;
 
 //TODO:: Refactor to common interface with server facade
@@ -85,7 +86,7 @@ public class ClientFacade implements AutoCloseable {
      * @throws IOException if connecting with the server failed
      * @throws InterruptedException if the thread is interrupted
      */
-    public Set<Scooter> getFreeScootersInDistance(Location location)
+    public Map<Location, Integer> getFreeScootersInDistance(Location location)
             throws IOException, InterruptedException {
         FreeScootersWithinDistanceRequest request = new FreeScootersWithinDistanceRequest(location);
 

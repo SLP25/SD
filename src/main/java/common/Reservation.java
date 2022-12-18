@@ -50,17 +50,15 @@ public class Reservation extends Lockable {
     /**
      * Parameterized constructor
      * @param id the id of the reservation
-     * @param scooterId the unique identifier of the reserved scooter
      * @param user the username of the user who made the reservation
      * @param startLocation the location of the scooter when the reservation was made
      * @param endLocation the location of the scooter when the reservation was terminated
      * @param startTime the date/time the reservation was made
      * @param endTime the date/time the reservation was terminated
      */
-    public Reservation(int id, int scooterId, String user, Location startLocation, Location endLocation,
+    public Reservation(int id, String user, Location startLocation, Location endLocation,
                        LocalDateTime startTime, LocalDateTime endTime) {
         super(id);
-        this.scooterId = scooterId;
         this.user = user;
         this.startLocation = startLocation;
         this.endLocation = endLocation;
@@ -71,13 +69,12 @@ public class Reservation extends Lockable {
     /**
      * Parameterized constructor for a reservation yet to be terminated
      * @param id the id of the reservation
-     * @param scooterId the unique identifier of the reserved scooter
      * @param user the username of the user who made the reservation
      * @param startLocation the location of the scooter when the reservation was made
      * @param startTime the date/time the reservation was made
      */
-    public Reservation(int id, int scooterId, String user, Location startLocation, LocalDateTime startTime) {
-        this(id, scooterId, user, startLocation, null, startTime, null);
+    public Reservation(int id, String user, Location startLocation, LocalDateTime startTime) {
+        this(id, user, startLocation, null, startTime, null);
     }
 
     /**
@@ -85,14 +82,14 @@ public class Reservation extends Lockable {
      * @param r the reservation to copy
      */
     public Reservation(Reservation r) {
-        this(r.getId(), r.scooterId, r.user, r.startLocation, r.endLocation, r.startTime, r.endTime);
+        this(r.getId(), r.getUser(), r.startLocation, r.endLocation, r.startTime, r.endTime);
     }
 
     /**
      * Default constructor
      */
     public Reservation() {
-        this(-1, -1, "", null, null);
+        this(-1, "", null, null);
     }
 
     /**
@@ -109,15 +106,6 @@ public class Reservation extends Lockable {
      */
     public static int getPricePerUnitTravelled() {
         return pricePerUnitTravelled;
-    }
-
-    /**
-     * Gets the unique identifier of the reserved scooter
-     *
-     * @return the unique identifier of the reserved scooter
-     */
-    public int getScooterId() {
-        return scooterId;
     }
 
     /**

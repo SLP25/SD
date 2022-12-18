@@ -10,6 +10,7 @@ import javafx.util.Pair;
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,10 +33,10 @@ public class Main {
             System.out.println(facade.authenticate("vasques", "password1234"));
             System.out.println(facade.register("batata", "password1234"));
 
-            Set<Scooter> scooters = facade.getFreeScootersInDistance(new Location(10,10));
+            Map<Location, Integer> scooters = facade.getFreeScootersInDistance(new Location(10,10));
             System.out.println(scooters.size());
-            for(Scooter s : scooters) {
-                System.out.println(s.toString());
+            for(Location l : scooters.keySet()) {
+                System.out.println(l.toString());
             }
 
             Pair<Integer, Location> p = facade.reserveScooter(new Location(10, 10));

@@ -1,12 +1,12 @@
 package server.messageHandling;
 
-import common.Scooter;
+import common.Location;
 import common.User;
 import common.messages.*;
 import server.ClientHandler;
 import server.ServerFacade;
 
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -34,7 +34,7 @@ public class FreeScootersWithinDistanceRequestHandler implements IMessageHandler
         //TODO:: Check authentication
         FreeScootersWithinDistanceRequest request = (FreeScootersWithinDistanceRequest)message;
 
-        Set<Scooter> ans = facade.getFreeScootersInDistance(request.getLocation());
+        Map<Location, Integer> ans = facade.getFreeScootersInDistance(request.getLocation());
 
         System.out.println(ans.size());
         FreeScootersWithinDistanceResponse response = new FreeScootersWithinDistanceResponse(ans);

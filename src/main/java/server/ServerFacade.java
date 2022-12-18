@@ -3,9 +3,7 @@ package server;
 import common.*;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * The server facade. Exposes all the supported functionality
@@ -14,12 +12,12 @@ public class ServerFacade {
     /**
      * The size of the grid
      */
-    private static int N;
+    public static int N;
 
     /**
      * The size of the grid
      */
-    private static int D;
+    public static int D;
 
     /**
      * The collection of rewards
@@ -59,7 +57,7 @@ public class ServerFacade {
         N = n;
         D = d;
         rewards = new RewardCollection();
-        scooters = new ScooterCollection(N, scooterCount);
+        scooters = new ScooterCollection(scooterCount);
         reservations = new ReservationCollection();
         users = new UserCollection();
     }
@@ -104,23 +102,14 @@ public class ServerFacade {
      * @param location the location to center the search around
      * @return all free scooters within a certain distance of the given location
      */
-    public Set<Scooter> getFreeScootersInDistance(Location location) {
-        Set<Scooter> ans = new TreeSet<>();
-
-        scooters.readLock().lock();
-        for(Scooter s : scooters.getScooters())
-            s.lock();
-
-        scooters.readLock().unlock();
-
-        for(Scooter s : scooters.getScooters()) {
-            if(Location.distance(s.getLocation(), location) <= D)
-                ans.add(new Scooter(s));
-
-            s.unlock();
+    public Map<Location, Integer> getFreeScootersInDistance(Location location) {
+        scooters.lockLocation(location, false);
+        try  {
+            Map<Location, Integer> ans = scooters.getFreeScootersInRange(location);
+            return ans;
+        } finally {
+            scooters.unlockLocation(location, false);
         }
-
-        return ans;
     }
 
     /**
@@ -134,36 +123,18 @@ public class ServerFacade {
      */
     public Reservation reserveScooter(String user, Location location) {
 
-        scooters.readLock().lock();
-        for(Scooter s : scooters.getScooters())
-            s.lock();
-
-        Scooter sc = null;
-        int distance = D + 1;
-        for(Scooter s : scooters.getScooters()) {
-            int d = Location.distance(s.getLocation(), location);
-            if(d < distance) {
-                distance = d;
-                sc = s;
-            }
-        }
-
+        scooters.lockLocation(location, true);
         reservations.writeLock().lock();
-        scooters.readLock().unlock();
-
-        Reservation ans = new Reservation(reservations.getNumberReservations(),
-                sc.getId(), user, sc.getLocation(), LocalDateTime.now());
-
-        for(Scooter s : scooters.getScooters())
-            s.unlock();
-
-        reservations.addReservation(ans);
-
-        reservations.writeLock().unlock();
-
-        runRewards.run();
-
-        return ans;
+        try  {
+            Location l = scooters.reserveScooter(location);
+            Reservation ans = new Reservation(reservations.getNumberReservations(),
+                    user, l, LocalDateTime.now());
+            reservations.addReservation(ans);
+            return ans;
+        } finally {
+            scooters.unlockLocation(location, true);
+            reservations.writeLock().unlock();
+        }
     }
 
     /**
@@ -182,15 +153,14 @@ public class ServerFacade {
 
             //Only the user who started the reservation can end it
             if(r.getUser().equals(user)) {
-                scooters.readLock().lock();
-                Scooter sc = scooters.getScooter(r.getScooterId());
+                r.terminate(location);
+                cost = r.getCost();
 
-                if(sc != null) {
-                    sc.lock();
-                    sc.free(location);
-                    r.terminate(location);
-                    cost = r.getCost();
-                    sc.unlock();
+                scooters.lockLocation(location, true);
+                try  {
+                    scooters.freeScooter(location);
+                } finally {
+                    scooters.unlockLocation(location, true);
                 }
             }
 
@@ -212,62 +182,50 @@ public class ServerFacade {
      */
     //TODO:: Heavy optimization
     public void generateRewards(int d) {
-        int[][] grid = new int[N][N];
-        for(int i = 0; i < N; i++)
-            for(int j = 0; j < N; j++)
-                grid[i][j] = 0;
+        //We use lists because having order will be useful in the end
+        //when we randomly pick the index of the end location of a reward
+        List<Location> emptyLocations = new ArrayList<>();
+        List<Location> fullLocations = new ArrayList<>();
 
-        Set<Location> emptyLocations = new TreeSet<>();
-        Set<Location> fullLocations = new TreeSet<>();
-        scooters.readLock().lock();
+        scooters.lockEverything(false);
         rewards.writeLock().lock();
-        for(Scooter sc : scooters.getScooters())
-            sc.lock();
+        try {
+            Map<Location, Integer> sc = scooters.getAllScooters();
+            for(Map.Entry<Location, Integer> kv: sc.entrySet()) {
+                if(kv.getValue() > 1) {
+                    fullLocations.add(kv.getKey());
+                }
+            }
 
-        for(Scooter sc : scooters.getScooters()) {
-            Location l = sc.getLocation();
-            grid[l.getX()][l.getY()]++;
-        }
+            int n = ServerFacade.N;
 
-        for(int i = 0; i < N; i++) {
-            for(int j = 0; j < N; j++) {
-                if(grid[i][j] > 1) {
-                    fullLocations.add(new Location(i, j));
-                } else if(grid[i][j] == 0) {
-                    boolean empty = true;
-                    for(int h = -d; h <= d; h++) {
-                        for(int k = -(d - Math.abs(h)); k <= (d - Math.abs(h)); k++) {
-                            if(grid[i][j] != 0)
-                                empty = false;
-                        }
-                    }
-
-                    if(empty) {
+            for(int i = 0; i < N; i++) {
+                for(int j = 0; j < N; j++) {
+                    if(scooters.getFreeScootersInRange(new Location(i,j)) == null) {
                         emptyLocations.add(new Location(i,j));
                     }
                 }
             }
+
+            Set<Reward> r = generateRewards(emptyLocations, fullLocations);
+            rewards.replaceAll(r);
+            System.out.println("Generated " + rewards.size() + " rewards");
+        } finally {
+            scooters.unlockEverything(false);
+            rewards.writeLock().unlock();
         }
-        Set<Reward> r = generateRewards(emptyLocations, fullLocations);
-
-        rewards.replaceAll(r);
-
-        //Ordem de libertar locks
-        for(Scooter sc : scooters.getScooters())
-            sc.unlock();
-        scooters.readLock().unlock();
-        rewards.writeLock().unlock();
-
-        System.out.println("Generated " + rewards.size() + " rewards");
     }
 
-    private Set<Reward> generateRewards(Set<Location> emptyLocations, Set<Location> fullLocations) {
+    private Set<Reward> generateRewards(List<Location> emptyLocations, List<Location> fullLocations) {
         Set<Reward> ans = new HashSet<>();
+        Random rnd = new Random();
+        for(Location x : fullLocations) {
+            int i = rnd.nextInt(emptyLocations.size());
+            //Pick a random prize money for the reward in the range
+            //[Reward.minimumPrize, Reward.maximumPrize]
+            int money = rnd.nextInt(Reward.maximumPrize - Reward.minimumPrize) + Reward.minimumPrize;
+            ans.add(new Reward(x, emptyLocations.get(i), money));
 
-        for(Location x : emptyLocations) {
-            for(Location y : fullLocations) {
-                ans.add(new Reward(x, y, 69420));
-            }
         }
 
         return ans;

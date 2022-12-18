@@ -1,13 +1,12 @@
 package common.messages;
 
 import common.Location;
-import common.Scooter;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * A response to the {@link, #FreeScootersWithinDistanceRequest} request
@@ -19,37 +18,37 @@ public class FreeScootersWithinDistanceResponse extends Message {
     }
 
     /**
-     * The set of scooters within the given distance (composition)
+     * All scooters in range (location and number of scooters per location)
      */
-    private Set<Scooter> scooters;
+    private Map<Location, Integer> scooters;
 
 
     /**
      * Default constructor
      */
     public FreeScootersWithinDistanceResponse() {
-        scooters = new TreeSet<>();
+        scooters = new TreeMap<>();
     }
 
     /**
      * Parameterized constructor
      * @param sc the scooters in range
      */
-    public FreeScootersWithinDistanceResponse(Set<Scooter> sc) {
-        scooters = new TreeSet<>();
-        for(Scooter s : sc)
-            scooters.add(new Scooter(s));
+    public FreeScootersWithinDistanceResponse(Map<Location, Integer> sc) {
+        scooters = new TreeMap<>();
+        for(Map.Entry<Location, Integer> s : sc.entrySet())
+            scooters.put(s.getKey(), s.getValue());
     }
 
     /**
      * Gets the scooters in range
-     * @return the scooters in range (composition
+     * @return All scooters in range (location and number of scooters per location)
      */
-    public Set<Scooter> getScooters() {
-        Set<Scooter> ans = new TreeSet<>();
+    public Map<Location, Integer> getScooters() {
+        Map<Location, Integer> ans = new TreeMap<>();
 
-        for(Scooter s : scooters)
-            ans.add(new Scooter(s));
+        for(Map.Entry<Location, Integer> s : scooters.entrySet())
+            scooters.put(s.getKey(), s.getValue());
 
         return ans;
     }
@@ -66,8 +65,10 @@ public class FreeScootersWithinDistanceResponse extends Message {
     protected void serializeMessage(DataOutputStream out) throws IOException {
         out.writeInt(scooters.size());
 
-        for(Scooter sc : scooters)
-            sc.serialize(out);
+        for(Map.Entry<Location, Integer> s : scooters.entrySet()) {
+            s.getKey().serialize(out);
+            out.writeInt(s.getValue());
+        }
     }
 
     /**
@@ -80,10 +81,13 @@ public class FreeScootersWithinDistanceResponse extends Message {
     protected Message deserializeMessage(DataInputStream in) throws IOException {
         int count = in.readInt();
 
-        Set<Scooter> sc = new TreeSet<>();
+        Map<Location, Integer> sc = new TreeMap<>();
 
-        for(int i = 0; i < count; i++)
-            sc.add(Scooter.deserialize(in));
+        for(int i = 0; i < count; i++) {
+            Location l = Location.deserialize(in);
+            int c = in.readInt();
+            sc.put(l, c);
+        }
 
         return new FreeScootersWithinDistanceResponse(sc);
     }

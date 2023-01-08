@@ -2,12 +2,11 @@ package client;
 
 import common.*;
 import common.messages.*;
-import javafx.util.Pair;
+import utils.Pair;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Map;
-import java.util.Set;
 
 //TODO:: Refactor to common interface with server facade
 /**

@@ -48,7 +48,7 @@ public class FreeScootersWithinDistanceResponse extends Message {
         Map<Location, Integer> ans = new TreeMap<>();
 
         for(Map.Entry<Location, Integer> s : scooters.entrySet())
-            scooters.put(s.getKey(), s.getValue());
+            ans.put(s.getKey(), s.getValue());
 
         return ans;
     }

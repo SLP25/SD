@@ -1,6 +1,7 @@
 package server.messageHandling;
 
 import common.Reservation;
+import common.TaggedConnection;
 import common.User;
 import common.messages.*;
 import server.ClientHandler;
@@ -20,20 +21,19 @@ public class ReserveScooterRequestHandler implements IMessageHandler {
     /**
      * Method responsible for processing the request and computing the response of the server
      * @param facade the facade of the server
-     * @param message the incoming request
-     * @param user the current user
-     * @param setUser a method used to set the user who made the request. Useful to set the current user on
-     *                login requests
-     * @return
+     * @param frame the incoming request
+     * @param state the connection state
+     * @return the appropriate response
      */
     @Override
-    public Message processMessage(ServerFacade facade, Message message, User user, Consumer<User> setUser) {
+    public Message processMessage(ServerFacade facade, TaggedConnection.Frame frame, ClientHandler.State state) {
+        Message message = frame.getMessage();
         if(!(message instanceof ReserveScooterRequest)) //TODO:: Change exception
             throw new RuntimeException("Cannot process messages other than registration requests");
 
         ReserveScooterRequest request = (ReserveScooterRequest)message;
 
-        Reservation r = facade.reserveScooter(user.getUsername(), request.getLocation());
+        Reservation r = facade.reserveScooter(state.currentUser.getUsername(), request.getLocation());
 
         ReserveScooterResponse response = new ReserveScooterResponse(r.getStartLocation(), r.getId());
         return response;

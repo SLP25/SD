@@ -1,7 +1,9 @@
 package server.messageHandling;
 
+import common.TaggedConnection;
 import common.User;
 import common.messages.Message;
+import server.ClientHandler;
 import server.ServerFacade;
 
 import java.util.function.Consumer;
@@ -16,11 +18,9 @@ public interface IMessageHandler {
     /**
      * Method responsible for processing the request and computing the response of the server
      * @param facade the facade of the server
-     * @param message the incoming request
-     * @param user the current user
-     * @param setUser a method used to set the user who made the request. Useful to set the current user on
-     *                login requests
+     * @param frame the incoming request
+     * @param state the connection state
      * @return the appropriate response
      */
-    Message processMessage(ServerFacade facade, Message message, User user, Consumer<User> setUser);
+    Message processMessage(ServerFacade facade, TaggedConnection.Frame frame, ClientHandler.State state);
 }

@@ -71,6 +71,14 @@ public class ServerFacade {
     }
 
     /**
+     * Gets the subscription to the
+     * @param r the method used to trigger reward generation
+     */
+    public SubscribableQueue<Notification>.Subscription getRewardSubscription() {
+        return this.rewards.getSubscription();
+    }
+
+    /**
      * Logs a user in the system
      *
      * @implNote the user returned is a deep copy of the one stored in the facade

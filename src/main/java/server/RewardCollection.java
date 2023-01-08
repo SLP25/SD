@@ -1,5 +1,6 @@
 package server;
 
+import common.Notification;
 import common.Reward;
 
 import java.util.*;
@@ -13,13 +14,33 @@ public class RewardCollection extends LockableCollection {
     /**
      * All rewards currently active in the server
      */
-    private Set<Reward> rewards;
+    private final Set<Reward> rewards;
+    private final SubscribableQueue<Notification> queue;
 
     /**
      * Default constructor
      */
     public RewardCollection() {
         this.rewards = new HashSet<>();
+        this.queue = new SubscribableQueue<>();
+    }
+
+    /**
+     * Adds the reward to the collection
+     * @param r the reward
+     */
+    public void add(Reward r) {
+        this.rewards.add(r);
+        this.queue.push(new Notification(r));
+    }
+
+    /**
+     * Adds all rewards to the collection
+     * @param rs the rewards
+     */
+    public void addAll(Collection<Reward> rs) {
+        this.rewards.addAll(rs);
+        this.queue.push(new Notification(rs));
     }
 
     /**
@@ -27,10 +48,8 @@ public class RewardCollection extends LockableCollection {
      * @param rs the new rewards
      */
     public void replaceAll(Collection<Reward> rs) {
-        this.rewards = new HashSet<>();
-        for(Reward r : rs) {
-            this.rewards.add(r);
-        }
+        this.rewards.clear();
+        this.addAll(rs);
     }
 
     /**
@@ -46,13 +65,14 @@ public class RewardCollection extends LockableCollection {
      * @return all rewards active in the server
      */
     public Collection<Reward> getRewards() {
-        Collection<Reward> result = new HashSet<>();
+        return new HashSet<>(rewards);
+    }
 
-        for(Reward r : rewards) {
-            result.add(r);
-        }
-
-
-        return result;
+    /**
+     * Gets a subscription to the update queue
+     * @return A subscription to the update queue
+     */
+    public SubscribableQueue<Notification>.Subscription getSubscription() {
+        return this.queue.getSubscription();
     }
 }

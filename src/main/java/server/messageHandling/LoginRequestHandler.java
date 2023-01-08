@@ -1,5 +1,6 @@
 package server.messageHandling;
 
+import common.TaggedConnection;
 import common.User;
 import common.messages.LoginRequest;
 import common.messages.LoginResponse;
@@ -20,21 +21,20 @@ public class LoginRequestHandler implements IMessageHandler {
     /**
      * Method responsible for processing the request and computing the response of the server
      * @param facade the facade of the server
-     * @param message the incoming request
-     * @param user the current user
-     * @param setUser a method used to set the user who made the request. Useful to set the current user on
-     *                login requests
+     * @param frame the incoming request
+     * @param state the connection state
      * @return the appropriate response
      */
     @Override
-    public Message processMessage(ServerFacade facade, Message message, User user, Consumer<User> setUser) {
+    public Message processMessage(ServerFacade facade, TaggedConnection.Frame frame, ClientHandler.State state) {
+        Message message = frame.getMessage();
         if(!(message instanceof LoginRequest)) //TODO:: Change exception
             throw new RuntimeException("Cannot process messages other than login requests");
 
         LoginRequest request = (LoginRequest)message;
 
         User u = facade.authenticate(request.getUsername(), request.getPassword());
-        setUser.accept(u);
+        state.currentUser = u;
         System.out.println(u != null);
 
         LoginResponse response = new LoginResponse(u);

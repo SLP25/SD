@@ -4,8 +4,7 @@ import common.ClassLoader;
 import common.Location;
 import common.messages.*;
 import common.*;
-import javafx.scene.SubScene;
-import javafx.util.Pair;
+import utils.Pair;
 
 import java.io.*;
 import java.net.Socket;
@@ -40,11 +39,11 @@ public class Main {
             }
 
             Pair<Integer, Location> p = facade.reserveScooter(new Location(10, 10));
-            System.out.println(p.getKey());
-            System.out.println(p.getValue());
+            System.out.println(p.getFirst());
+            System.out.println(p.getSecond());
 
             Thread.sleep(5000);
-            System.out.println(facade.endReservation(p.getKey(), new Location(0,0)));
+            System.out.println(facade.endReservation(p.getFirst(), new Location(0,0)));
         } catch(Exception e) {
             System.out.println(e.toString());
         }

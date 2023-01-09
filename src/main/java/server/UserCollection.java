@@ -89,8 +89,8 @@ public class UserCollection {
      */
     //TODO: Throw exception
     private void seedData() {
-        //I will propably be killed for this
-        final String filePath = "/home/rui-oliveira02/Documents/Projetos/SD/data/users.txt";
+        //I will propably be killed for this // nice one g
+        final String filePath = "./data/users.txt";
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             String line = reader.readLine();

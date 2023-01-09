@@ -22,6 +22,10 @@ public class RewardNotification extends Message {
         this.notification = n;
     }
 
+    public Notification getNotification() {
+        return notification;
+    }
+
     @Override
     protected void serializeMessage(DataOutputStream out) throws IOException {
         this.notification.serialize(out);

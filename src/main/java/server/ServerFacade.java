@@ -138,6 +138,7 @@ public class ServerFacade {
             Reservation ans = new Reservation(reservations.getNumberReservations(),
                     user, l, LocalDateTime.now());
             reservations.addReservation(ans);
+            runRewards.run();
             return ans;
         } finally {
             scooters.unlockLocation(location, true);
@@ -208,7 +209,7 @@ public class ServerFacade {
 
             for(int i = 0; i < N; i++) {
                 for(int j = 0; j < N; j++) {
-                    if(scooters.getFreeScootersInRange(new Location(i,j)) == null) {
+                    if(scooters.getFreeScootersInRange(new Location(i,j)).size() == 0) {
                         emptyLocations.add(new Location(i,j));
                     }
                 }

@@ -27,6 +27,9 @@ public class Notification {
         this.rewards = rs.stream().collect(Collectors.toSet());
     }
 
+    public Set<Reward> getRewards() {
+        return this.rewards;
+    }
 
     public void serialize(DataOutputStream stream) throws IOException {
         stream.writeInt(rewards.size());

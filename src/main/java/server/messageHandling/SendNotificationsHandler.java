@@ -12,7 +12,7 @@ import java.io.IOException;
 public class SendNotificationsHandler implements IMessageHandler {
     //Register the class in the super class, as to allow for deserialization
     static {
-        ClientHandler.registerHandler(SendNotificationsRequest.class, new ReserveScooterRequestHandler());
+        ClientHandler.registerHandler(SendNotificationsRequest.class, new SendNotificationsHandler());
     }
 
     /**

@@ -75,6 +75,8 @@ public class ScooterCollection extends LockableCollection {
                 d = dist;
             }
         }
+        if(sc == null)
+            return null;
         Location chunkIndex = getChunkIndex(sc);
         return grid[chunkIndex.getX()][chunkIndex.getY()].reserveScooter(target);
     }

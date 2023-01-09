@@ -156,6 +156,33 @@ public class Client implements IClient {
         return response.getCost();
     }
 
+    public void startNotifications() throws IOException {
+        SendNotificationsRequest request = new SendNotificationsRequest();
+        conn.send(2, request);
+
+        new Thread(() -> {
+            while(true) {//TODO:: Signal end of notifications
+                try {
+                    Message msg = conn.receive(2);
+                    RewardNotification not = (RewardNotification)msg;
+                    for(Reward r : not.getNotification().getRewards()) {
+                        System.out.println(r.toString());
+                    }
+                } catch (IOException e) {
+                    System.out.println("Error receiving notifications");
+                } catch (InterruptedException e) {
+
+                }
+
+            }
+        }).start();
+    }
+
+    public void stopNotifications() throws IOException {
+        CancelNotificationsRequest request = new CancelNotificationsRequest();
+        conn.send(1, request);
+    }
+
     private void assertAuthenticated(Message msg) throws RuntimeException {
         if(msg instanceof NotAuthenticatedResponse)
             throw new NotAuthenticatedException("Not logged in");

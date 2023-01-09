@@ -31,7 +31,11 @@ public class FreeScootersWithinDistanceRequestHandler implements IMessageHandler
         Message message = frame.getMessage();
         if(!(message instanceof FreeScootersWithinDistanceRequest)) //TODO:: Change exception
             throw new RuntimeException("Cannot process messages other than free scooters within distance requests");
-        //TODO:: Check authentication
+
+        if(state.currentUser == null) {
+            return new NotAuthenticatedResponse();
+        }
+
         FreeScootersWithinDistanceRequest request = (FreeScootersWithinDistanceRequest)message;
 
         Map<Location, Integer> ans = facade.getFreeScootersInDistance(request.getLocation());

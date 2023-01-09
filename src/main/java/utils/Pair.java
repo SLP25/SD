@@ -31,4 +31,9 @@ public class Pair<F, S> {
     public static <F, S> Pair<F, S> of(final F first, final S second) {
         return new Pair<>(first, second);
     }
+
+    @Override
+    public String toString() {
+        return String.format("(%s,%s)", this.getFirst().toString(), this.getSecond().toString());
+    }
 }

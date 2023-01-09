@@ -39,7 +39,7 @@ public final class Output {
                         removeLastChar(arg.toString().substring(1)).replace("={", " = {") + "\n");
                 break;
             default:
-                System.out.println(arg);
+                System.out.println(arg.toString());
                 break;
         }
     }

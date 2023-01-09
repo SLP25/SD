@@ -2,10 +2,7 @@ package server.messageHandling;
 
 import common.Notification;
 import common.TaggedConnection;
-import common.messages.CancelNotificationsRequest;
-import common.messages.Message;
-import common.messages.RewardNotification;
-import common.messages.SendNotificationsRequest;
+import common.messages.*;
 import server.ClientHandler;
 import server.ServerFacade;
 import server.SubscribableQueue;
@@ -25,6 +22,10 @@ public class CancelNotificationsHandler implements IMessageHandler {
      */
     @Override
     public Message processMessage(ServerFacade facade, TaggedConnection.Frame frame, ClientHandler.State state) {
+        if(state.currentUser == null) {
+            return new NotAuthenticatedResponse();
+        }
+
         if (state.subscription != null) {
             state.subscription.close();
             state.subscription = null;

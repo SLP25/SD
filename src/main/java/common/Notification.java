@@ -19,11 +19,12 @@ public class Notification {
     public final Set<Reward> rewards;
 
     public Notification(Reward r) {
-        this.rewards = Set.of(r);
+        this.rewards = new HashSet<>();
+        this.rewards.add(r);
     }
 
     public Notification(Collection<Reward> rs) {
-        this.rewards = rs.stream().collect(Collectors.toUnmodifiableSet());
+        this.rewards = rs.stream().collect(Collectors.toSet());
     }
 
 

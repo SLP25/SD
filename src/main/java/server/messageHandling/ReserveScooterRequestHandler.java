@@ -31,6 +31,10 @@ public class ReserveScooterRequestHandler implements IMessageHandler {
         if(!(message instanceof ReserveScooterRequest)) //TODO:: Change exception
             throw new RuntimeException("Cannot process messages other than registration requests");
 
+        if(state.currentUser == null) {
+            return new NotAuthenticatedResponse();
+        }
+
         ReserveScooterRequest request = (ReserveScooterRequest)message;
 
         Reservation r = facade.reserveScooter(state.currentUser.getUsername(), request.getLocation());

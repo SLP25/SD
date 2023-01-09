@@ -46,14 +46,15 @@ public class CommandLine {
                         Output.showln(method.invoke(
                                 instance,
                                 ReflectionUtils.argsGenerator(
-                                        Arrays.copyOfRange(input, 1, input.length), method.getParameterTypes())));
+                                    Arrays.copyOfRange(input, 1, input.length), method.getParameterTypes())));
                     }
             }
         } catch (InstantiationException
-                 | InvocationTargetException
                  | NoSuchMethodException
                  | IllegalAccessException e) {
             Output.showln("Invalid Option");
+        } catch( InvocationTargetException e) {
+            Output.showln(e.getTargetException().getMessage());
         }
     }
 

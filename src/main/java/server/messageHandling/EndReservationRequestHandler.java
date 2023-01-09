@@ -31,6 +31,10 @@ public class EndReservationRequestHandler implements IMessageHandler {
         if(!(message instanceof EndReservationRequest)) //TODO:: Change exception
             throw new RuntimeException("Cannot process messages other than registration requests");
 
+        if(state.currentUser == null) {
+            return new NotAuthenticatedResponse();
+        }
+
         EndReservationRequest request = (EndReservationRequest) message;
 
         int cost = facade.endReservation(state.currentUser.getUsername(), request.getReservationCode(), request.getLocation());

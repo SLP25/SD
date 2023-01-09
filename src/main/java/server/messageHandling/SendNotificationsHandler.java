@@ -2,10 +2,7 @@ package server.messageHandling;
 
 import common.Notification;
 import common.TaggedConnection;
-import common.messages.Message;
-import common.messages.ReserveScooterRequest;
-import common.messages.RewardNotification;
-import common.messages.SendNotificationsRequest;
+import common.messages.*;
 import server.ClientHandler;
 import server.ServerFacade;
 import server.SubscribableQueue;
@@ -28,6 +25,10 @@ public class SendNotificationsHandler implements IMessageHandler {
     @Override
     public Message processMessage(ServerFacade facade, TaggedConnection.Frame frame, ClientHandler.State state) {
         Message message = frame.getMessage();
+        if(state.currentUser == null) {
+            return new NotAuthenticatedResponse();
+        }
+
         if (state.subscription == null) {
             SubscribableQueue<Notification>.Subscription sub = facade.getRewardSubscription();
             state.subscription = sub;

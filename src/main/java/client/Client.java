@@ -1,5 +1,6 @@
 package client;
 
+import client.exceptions.NotAuthenticatedException;
 import common.*;
 import common.messages.*;
 import utils.Pair;
@@ -91,7 +92,7 @@ public class Client implements IClient {
      * @throws InterruptedException if the thread is interrupted
      */
     public Map<Location, Integer> getFreeScootersInDistance(Integer x, Integer y)
-            throws IOException, InterruptedException {
+            throws IOException, InterruptedException, NotAuthenticatedException {
 
         Location location = new Location(x, y);
 
@@ -99,7 +100,9 @@ public class Client implements IClient {
 
         conn.send(1, request);
 
-        FreeScootersWithinDistanceResponse response = (FreeScootersWithinDistanceResponse)conn.receive(1);
+        Message msg = conn.receive(1);
+        assertAuthenticated(msg);
+        FreeScootersWithinDistanceResponse response = (FreeScootersWithinDistanceResponse)msg;
 
         return response.getScooters();
     }
@@ -110,21 +113,25 @@ public class Client implements IClient {
      *
      * @implNote the reservation returned is a deep copy of the one stored in the facade
      *
-     * @param location the location to center the search in
+     * @param x the x coordinate of the target location
+     * @param y the y coordinate of the target location
+     *
      * @return the reservation code and the location of the scooter
      * @throws IOException if connecting with the server failed
      * @throws InterruptedException if the thread is interrupted
      */
-    /*public Pair<Integer, Location> reserveScooter(Location location)
+    public Pair<Integer, Location> reserveScooter(Integer x, Integer y)
             throws IOException, InterruptedException {
+        Location location = new Location(x,y);
         ReserveScooterRequest request = new ReserveScooterRequest(location);
 
         conn.send(1, request);
-
-        ReserveScooterResponse response = (ReserveScooterResponse)conn.receive(1);
+        Message msg = conn.receive(1);
+        assertAuthenticated(msg);
+        ReserveScooterResponse response = (ReserveScooterResponse)msg;
 
         return new Pair<>(response.getReservationCode(), response.getLocation());
-    }*/
+    }
 
     /**
      * Ends a reservation
@@ -142,9 +149,16 @@ public class Client implements IClient {
 
         conn.send(1, request);
 
-        EndReservationResponse response = (EndReservationResponse)conn.receive(1);
+        Message msg = conn.receive(1);
+        assertAuthenticated(msg);
+        EndReservationResponse response = (EndReservationResponse)msg;
 
         return response.getCost();
+    }
+
+    private void assertAuthenticated(Message msg) throws RuntimeException {
+        if(msg instanceof NotAuthenticatedResponse)
+            throw new NotAuthenticatedException("Not logged in");
     }
 
     /**

@@ -5,14 +5,17 @@ import common.messages.*;
 import utils.Pair;
 
 import java.io.IOException;
+import java.util.Map;
+
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Map;
 
 //TODO:: Refactor to common interface with server facade
 /**
  * The client facade. Exposes all the supported functionality in the server
  */
-public class ClientFacade implements AutoCloseable {
+public class Client implements IClient {
     /**
      * The ip address of the server
      */
@@ -31,16 +34,6 @@ public class ClientFacade implements AutoCloseable {
     private Demultiplexer conn;
 
     /**
-     * Default constructor
-     * @throws IOException if creating the socket to the server failed
-     */
-    public ClientFacade() throws IOException {
-        Socket clientSocket = new Socket(ip, port);
-        conn = new Demultiplexer(new TaggedConnection(clientSocket));
-        conn.start();
-    }
-
-    /**
      * Logs a user in the system
      *
      * @param username the username of the user to try to log in as
@@ -55,6 +48,7 @@ public class ClientFacade implements AutoCloseable {
         conn.send(1, request);
 
         LoginResponse response = (LoginResponse)conn.receive(1);
+
 
         return response.getUser();
     }
@@ -78,15 +72,29 @@ public class ClientFacade implements AutoCloseable {
     }
 
     /**
+     * Default constructor
+     * @throws IOException if creating the socket to the server failed
+     */
+    public Client() throws IOException {
+        common.ClassLoader.loadClasses(Message.class.getPackage().getName(),
+                Arrays.asList(new String[]{"Message", "Exception"}));
+        Socket clientSocket = new Socket(ip, port);
+        conn = new Demultiplexer(new TaggedConnection(clientSocket));
+        conn.start();
+    }
+
+    /**
      * Gets all free scooters within a certain distance of the given location
      *
-     * @param location the location to center the search around
      * @return all free scooters within a certain distance of the given location
      * @throws IOException if connecting with the server failed
      * @throws InterruptedException if the thread is interrupted
      */
-    public Map<Location, Integer> getFreeScootersInDistance(Location location)
+    public Map<Location, Integer> getFreeScootersInDistance(Integer x, Integer y)
             throws IOException, InterruptedException {
+
+        Location location = new Location(x, y);
+
         FreeScootersWithinDistanceRequest request = new FreeScootersWithinDistanceRequest(location);
 
         conn.send(1, request);
@@ -107,7 +115,7 @@ public class ClientFacade implements AutoCloseable {
      * @throws IOException if connecting with the server failed
      * @throws InterruptedException if the thread is interrupted
      */
-    public Pair<Integer, Location> reserveScooter(Location location)
+    /*public Pair<Integer, Location> reserveScooter(Location location)
             throws IOException, InterruptedException {
         ReserveScooterRequest request = new ReserveScooterRequest(location);
 
@@ -116,17 +124,20 @@ public class ClientFacade implements AutoCloseable {
         ReserveScooterResponse response = (ReserveScooterResponse)conn.receive(1);
 
         return new Pair<>(response.getReservationCode(), response.getLocation());
-    }
+    }*/
 
     /**
      * Ends a reservation
      * @param id the id of the reservation
-     * @param location the location to park the scooter in
+     * @param x the x coordinate to the location to park the scooter in
+     * @param y the y coordinate to the location to park the scooter in
      * @return the price the user must pay for the reservation (-1 if ending the reservation failed)
      * @throws IOException if connecting with the server failed
      * @throws InterruptedException if the thread is interrupted
      */
-    public int endReservation(int id, Location location) throws IOException, InterruptedException {
+    public int endReservation(Integer id, Integer x, Integer y) throws IOException, InterruptedException {
+        Location location = new Location(x, y);
+
         EndReservationRequest request = new EndReservationRequest(location, id);
 
         conn.send(1, request);
@@ -140,7 +151,6 @@ public class ClientFacade implements AutoCloseable {
      * Closes the connection to the server
      * @throws Exception if closing the connection failed
      */
-    @Override
     public void close() throws Exception {
         conn.close();
     }

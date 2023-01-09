@@ -103,7 +103,6 @@ public abstract class Message {
      */
     public static Message deserialize(DataInputStream in) throws IOException {
         int code = in.readInt();
-        System.out.println(registeredSubClasses.size());
         if(!registeredSubClasses.containsKey(code))
             throw new IOException("No sub class with code " + code);
 

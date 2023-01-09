@@ -21,7 +21,6 @@ public class SubscribableQueue<T> {
     private QueueElem head = new QueueElem(null);
 
     public class Subscription implements Iterable<T>, AutoCloseable {
-        private boolean active = true;
         private QueueElem iterator;
 
         private Subscription() {
@@ -37,8 +36,8 @@ public class SubscribableQueue<T> {
         public void close() {
             lock.lock();
             try {
-                if (active) {
-                    active = false;
+                if (iterator != null) {
+                    iterator = null;
                     cond.signalAll();
                 }
             } finally {
@@ -50,10 +49,10 @@ public class SubscribableQueue<T> {
             lock.lock();
 
             try {
-                while (active && iterator.next == null)
+                while (iterator != null && iterator.next == null)
                     cond.await();
 
-                if (!active)
+                if (iterator == null)
                     return null;
 
                 iterator = iterator.next;

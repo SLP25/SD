@@ -39,8 +39,10 @@ public class RewardCollection extends LockableCollection {
      * @param rs the rewards
      */
     public void addAll(Collection<Reward> rs) {
-        this.rewards.addAll(rs);
-        this.queue.push(new Notification(rs));
+        if (rs.size() > 0) {
+            this.rewards.addAll(rs);
+            this.queue.push(new Notification(rs));
+        }
     }
 
     /**

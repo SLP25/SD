@@ -65,7 +65,6 @@ public class RewardGenerator implements Runnable {
     }
     @Override
     public void run() {
-        /*
         while(true) {
             lock.lock();
 
@@ -79,19 +78,6 @@ public class RewardGenerator implements Runnable {
             } catch(InterruptedException e) {
             }finally {
                 lock.unlock();
-            }
-        }
-        */
-
-        while (true) {
-            lock.lock();
-            facade.generateRewards(distance);
-            lock.unlock();
-            try {
-                Thread.sleep(10000);
-            }
-            catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
         }
     }

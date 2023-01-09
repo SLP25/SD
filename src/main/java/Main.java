@@ -13,9 +13,16 @@ public class Main {
      *
      * @params args Ignored
      */
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) {
         CommandLine commandLine = new CommandLine();
-        IClient client = new Client();
-        commandLine.shell(IClient.class, client);
+        try {
+            IClient client = new Client();
+            commandLine.shell(IClient.class, client);
+        } catch(IOException e) {
+            System.out.println("Could not connect to server. Terminating");
+        } catch(ClassNotFoundException e) {
+            System.out.println("There was a problem loading the user interface. Terminating");
+        }
+
     }
 }

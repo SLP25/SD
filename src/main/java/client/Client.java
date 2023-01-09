@@ -108,7 +108,6 @@ public class Client implements IClient {
         return response.getScooters();
     }
 
-    //TODO:: Use reservation
     /**
      * Reserves the scooter closest to the given location
      *

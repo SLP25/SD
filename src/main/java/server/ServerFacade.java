@@ -168,8 +168,10 @@ public class ServerFacade {
                 r.lock();
 
                 try {
-                    //Only the user who started the reservation can end it
-                    if(r.getUser().equals(user)) {
+                    // Only the user who started the reservation can end it
+                    // and the reservation must not already have been
+                    // terminated
+                    if(r.getUser().equals(user) && !r.hasTerminated()) {
                         r.terminate(location);
                         cost = r.getCost();
 

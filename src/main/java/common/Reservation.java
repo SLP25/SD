@@ -151,6 +151,14 @@ public class Reservation extends Lockable {
     }
 
     /**
+     * Gets whether the current reservation has already been terminated
+     * @return whether the current reservation has already been terminated
+     */
+    public boolean hasTerminated() {
+        return endLocation != null;
+    }
+
+    /**
      * Sets the price of having the scooter reserved for 1 second
      * @param price the new price of having the scooter reserved for 1 second
      */

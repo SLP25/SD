@@ -34,7 +34,6 @@ public class RegistrationRequestHandler implements IMessageHandler {
 
         User u = facade.register(request.getUsername(), request.getPassword());
         state.currentUser = u;
-        System.out.println(u != null);
 
         RegistrationResponse response = new RegistrationResponse(u);
         return response;

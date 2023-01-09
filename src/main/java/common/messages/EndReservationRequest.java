@@ -85,4 +85,10 @@ public class EndReservationRequest extends Message {
 
         return new EndReservationRequest(l, c);
     }
+
+    @Override
+    public String toString() {
+        return String.format("EndReservationRequest (code: %d, location: %s)",
+                this.reservationCode, this.location.toString());
+    }
 }

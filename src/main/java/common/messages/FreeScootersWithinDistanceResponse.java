@@ -91,4 +91,9 @@ public class FreeScootersWithinDistanceResponse extends Message {
 
         return new FreeScootersWithinDistanceResponse(sc);
     }
+
+    @Override
+    public String toString() {
+        return String.format("FreeScootersWithinDistanceResponse (%d unique scooter positions)", this.scooters.size());
+    }
 }

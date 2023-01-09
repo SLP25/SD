@@ -16,8 +16,8 @@ public class SubscribableQueue<T> {
         }
     }
 
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Condition cond = lock.readLock().newCondition();
+    private final Lock lock = new ReentrantLock();
+    private final Condition cond = lock.newCondition();
     private QueueElem head = new QueueElem(null);
 
     public class Subscription implements Iterable<T>, AutoCloseable {
@@ -25,29 +25,29 @@ public class SubscribableQueue<T> {
         private QueueElem iterator;
 
         private Subscription() {
-            lock.readLock().lock();
+            lock.lock();
             try {
                 iterator = head;
             } finally {
-                lock.readLock().unlock();
+                lock.unlock();
             }
         }
 
         @Override
         public void close() {
-            lock.readLock().lock();
+            lock.lock();
             try {
                 if (active) {
                     active = false;
                     cond.signalAll();
                 }
             } finally {
-                lock.readLock().unlock();
+                lock.unlock();
             }
         }
 
         private T getNext() {
-            lock.readLock().lock();
+            lock.lock();
 
             try {
                 while (active && iterator.next == null)
@@ -61,7 +61,7 @@ public class SubscribableQueue<T> {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } finally {
-                lock.readLock().unlock();
+                lock.unlock();
             }
         }
 
@@ -101,13 +101,13 @@ public class SubscribableQueue<T> {
     public void push(T elem) {
         QueueElem e = new QueueElem(elem);
 
-        lock.writeLock().lock();
+        lock.lock();
         try {
             head.next = e;
             head = e;
             cond.signalAll();
         } finally {
-            lock.writeLock().unlock();
+            lock.unlock();
         }
     }
 
@@ -127,13 +127,13 @@ public class SubscribableQueue<T> {
             last = e;
         }
 
-        lock.writeLock().lock();
+        lock.lock();
         try {
             head.next = first;
             head = last;
             cond.signalAll();
         } finally {
-            lock.writeLock().unlock();
+            lock.unlock();
         }
     }
 }

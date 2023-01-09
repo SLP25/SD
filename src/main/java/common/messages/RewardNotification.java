@@ -12,9 +12,11 @@ public class RewardNotification extends Message {
         Message.registerSubClass(3141592, new RewardNotification());
     }
 
-    Notification notification;
+    private final Notification notification;
 
-    private RewardNotification() { }
+    public RewardNotification() {
+        this.notification = null;
+    }
 
     public RewardNotification(Notification n) {
         this.notification = n;
@@ -22,12 +24,16 @@ public class RewardNotification extends Message {
 
     @Override
     protected void serializeMessage(DataOutputStream out) throws IOException {
-        //TODO
+        this.notification.serialize(out);
     }
 
     @Override
     protected RewardNotification deserializeMessage(DataInputStream in) throws IOException {
-        //TODO
-        return null;
+        return new RewardNotification(Notification.deserialize(in));
+    }
+
+    @Override
+    public String toString() {
+        return String.format("RewardNotification (%d rewards)", this.notification.rewards.size());
     }
 }

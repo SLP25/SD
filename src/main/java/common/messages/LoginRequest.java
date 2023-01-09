@@ -81,4 +81,9 @@ public class LoginRequest extends Message {
 
         return new LoginRequest(user, pass);
     }
+
+    @Override
+    public String toString() {
+        return String.format("LoginRequest (username: '%s', password: '%s')", this.username, this.password);
+    }
 }

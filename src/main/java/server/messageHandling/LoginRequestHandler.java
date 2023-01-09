@@ -35,7 +35,6 @@ public class LoginRequestHandler implements IMessageHandler {
 
         User u = facade.authenticate(request.getUsername(), request.getPassword());
         state.currentUser = u;
-        System.out.println(u != null);
 
         LoginResponse response = new LoginResponse(u);
         return response;

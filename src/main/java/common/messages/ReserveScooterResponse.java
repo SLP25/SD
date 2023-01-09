@@ -88,4 +88,9 @@ public class ReserveScooterResponse extends Message {
 
         return new ReserveScooterResponse(l, c);
     }
+
+    @Override
+    public String toString() {
+        return String.format("ReserveScooterResponse (code: %d)", this.code);
+    }
 }

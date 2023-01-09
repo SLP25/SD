@@ -69,4 +69,9 @@ public class ReserveScooterRequest extends Message {
 
         return new ReserveScooterRequest(l);
     }
+
+    @Override
+    public String toString() {
+        return String.format("ReserveScooterRequest (location: %s)", this.location);
+    }
 }

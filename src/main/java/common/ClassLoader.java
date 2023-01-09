@@ -32,7 +32,7 @@ public class ClassLoader {
             for (Class c : classes)
                 c.newInstance();
         } catch(InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("Unable to load classes");
+            throw new RuntimeException("Unable to load classes", e);
         }
     }
 

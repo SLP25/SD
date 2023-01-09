@@ -81,4 +81,9 @@ public class RegistrationRequest extends Message {
 
         return new RegistrationRequest(user, pass);
     }
+
+    @Override
+    public String toString() {
+        return String.format("RegistrationRequest (username: '%s', password:'%s')", this.username, this.password);
+    }
 }

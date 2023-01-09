@@ -36,7 +36,6 @@ public class FreeScootersWithinDistanceRequestHandler implements IMessageHandler
 
         Map<Location, Integer> ans = facade.getFreeScootersInDistance(request.getLocation());
 
-        System.out.println(ans.size());
         FreeScootersWithinDistanceResponse response = new FreeScootersWithinDistanceResponse(ans);
         return response;
     }

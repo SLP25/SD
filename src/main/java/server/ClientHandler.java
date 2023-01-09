@@ -111,6 +111,8 @@ public class ClientHandler implements Runnable {
         try (
             State state = new State(this.socket)
         ) {
+            System.out.println("New client connected");
+
             Message curMessage = null;
             do {
                 TaggedConnection.Frame f = state.connection.receive();
@@ -122,9 +124,9 @@ public class ClientHandler implements Runnable {
                 }
             } while (curMessage != null);
         } catch(EOFException e) {
-            return; //Client closed, terminate normally
+            System.out.println("Client disconnected");
         } catch(IOException e) {
-            System.out.println(e);
+            System.out.println("Client disconnected abruptly: " + e.getMessage());
         }
     }
 
@@ -134,7 +136,12 @@ public class ClientHandler implements Runnable {
      * @return the outgoing message
      */
     private Message processMessage(TaggedConnection.Frame frame, State state) {
-        System.out.println(frame.getMessage());
-        return handlers.get(frame.getMessage().getClass()).processMessage(facade, frame, state);
+        Message response = handlers.get(frame.getMessage().getClass()).processMessage(facade, frame, state);
+
+        System.out.println("Received message: " + frame.getMessage().toString());
+        if (response != null)
+            System.out.println("Sending response: " + response.toString());
+
+        return response;
     }
 }

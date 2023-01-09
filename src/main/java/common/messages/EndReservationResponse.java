@@ -68,4 +68,9 @@ public class EndReservationResponse extends Message {
 
         return new EndReservationResponse(c);
     }
+
+    @Override
+    public String toString() {
+        return String.format("EndReservationResponse (cost: %d)", this.cost);
+    }
 }

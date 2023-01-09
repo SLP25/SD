@@ -70,4 +70,9 @@ public class FreeScootersWithinDistanceRequest extends Message {
 
         return new FreeScootersWithinDistanceRequest(l);
     }
+
+    @Override
+    public String toString() {
+        return String.format("FreeScootersWithinDistanceRequest (location: %s)", this.location.toString());
+    }
 }

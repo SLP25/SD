@@ -73,4 +73,9 @@ public class RegistrationResponse extends Message {
 
         return new RegistrationResponse(u);
     }
+
+    @Override
+    public String toString() {
+        return String.format("RegistrationResponse (%s)", this.user != null ? "success" : "fail");
+    }
 }

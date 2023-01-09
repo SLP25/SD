@@ -73,4 +73,9 @@ public class LoginResponse extends Message {
 
         return new LoginResponse(u);
     }
+
+    @Override
+    public String toString() {
+        return String.format("LoginResponse (%s)", this.user != null ? "success" : "fail");
+    }
 }

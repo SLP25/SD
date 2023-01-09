@@ -16,7 +16,7 @@ public class Notification {
         return new Notification(aux);
     }
 
-    private final Set<Reward> rewards;
+    public final Set<Reward> rewards;
 
     public Notification(Reward r) {
         this.rewards = Set.of(r);

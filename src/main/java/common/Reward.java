@@ -13,7 +13,7 @@ public final class Reward {
     /**
      * The minimum monetary value of a reward
      */
-    public static final int minimumPrize = 10000;
+    public static final int minimumPrize = 5000;
 
     /**
      * The maximum monetary value of a reward

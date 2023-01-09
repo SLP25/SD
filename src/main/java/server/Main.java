@@ -28,7 +28,22 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         loadClasses();
-        Server server = new Server(1000, 500, 420);
+        int n = 0, d = 0, scooters = 0;
+        try {
+            n = Integer.valueOf(args[0]);
+            d = Integer.valueOf(args[1]);
+            scooters = Integer.valueOf(args[2]);
+        } catch(Exception e) {
+            System.out.println("Invalid arguments. Terminating");
+            return;
+        }
+
+        if(d == 0 || n % d != 0) {
+            System.out.println("Invalid arguments: D must be a divisor of N");
+            return;
+        }
+
+        Server server = new Server(n, d, scooters);
         server.start(20023);
     }
 }

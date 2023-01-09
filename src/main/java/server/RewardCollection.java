@@ -3,6 +3,7 @@ package server;
 import common.Notification;
 import common.Reward;
 
+import common.Location;
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -32,6 +33,19 @@ public class RewardCollection extends LockableCollection {
     public void add(Reward r) {
         this.rewards.add(r);
         this.queue.push(new Notification(r));
+    }
+
+    public Reward isApplicable(Location start, Location end) {
+        for(Reward r : rewards) {
+            if(r.getStartLocation().equals(start) && r.getEndLocation().equals(end)) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+    public void remove(Reward r) {
+        this.rewards.remove(r);
     }
 
     /**

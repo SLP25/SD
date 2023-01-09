@@ -213,27 +213,27 @@ public class ScooterCollection extends LockableCollection {
         ans.add(chunkIndex);
         //Top-left corner
         if(chunkCoordinates.getX() < ServerFacade.D && chunkCoordinates.getY() < ServerFacade.D) {
-            ans.add(new Location(l.getX() - 1, l.getY()));
-            ans.add(new Location(l.getX() - 1, l.getY() - 1));
-            ans.add(new Location(l.getX(), l.getY() - 1));
+            ans.add(new Location(chunkIndex.getX() - 1, chunkIndex.getY()));
+            ans.add(new Location(chunkIndex.getX() - 1, chunkIndex.getY() - 1));
+            ans.add(new Location(chunkIndex.getX(), chunkIndex.getY() - 1));
         }
         //Top-right corner
         else if(chunkCoordinates.getX() >= ServerFacade.D && chunkCoordinates.getY() < ServerFacade.D) {
-            ans.add(new Location(l.getX() + 1, l.getY()));
-            ans.add(new Location(l.getX() + 1, l.getY() - 1));
-            ans.add(new Location(l.getX(), l.getY() - 1));
+            ans.add(new Location(chunkIndex.getX() + 1, chunkIndex.getY()));
+            ans.add(new Location(chunkIndex.getX() + 1, chunkIndex.getY() - 1));
+            ans.add(new Location(chunkIndex.getX(), chunkIndex.getY() - 1));
         }
         //Bottom-left corner
         else if(chunkCoordinates.getX() >= ServerFacade.D && chunkCoordinates.getY() < ServerFacade.D) {
-            ans.add(new Location(l.getX() - 1, l.getY()));
-            ans.add(new Location(l.getX() - 1, l.getY() + 1));
-            ans.add(new Location(l.getX(), l.getY() + 1));
+            ans.add(new Location(chunkIndex.getX() - 1, chunkIndex.getY()));
+            ans.add(new Location(chunkIndex.getX() - 1, chunkIndex.getY() + 1));
+            ans.add(new Location(chunkIndex.getX(), chunkIndex.getY() + 1));
         }
         //Bottom-right corner
         else if(chunkCoordinates.getX() >= ServerFacade.D && chunkCoordinates.getY() >= ServerFacade.D) {
-            ans.add(new Location(l.getX() + 1, l.getY()));
-            ans.add(new Location(l.getX() + 1, l.getY() + 1));
-            ans.add(new Location(l.getX(), l.getY() + 1));
+            ans.add(new Location(chunkIndex.getX() + 1, chunkIndex.getY()));
+            ans.add(new Location(chunkIndex.getX() + 1, chunkIndex.getY() + 1));
+            ans.add(new Location(chunkIndex.getX(), chunkIndex.getY() + 1));
         }
 
         //Remove invalid values (out of bounds)
@@ -252,18 +252,18 @@ public class ScooterCollection extends LockableCollection {
      */
     private void seedScooters(int numberScooters) {
         Random r = new Random();
-        /*grid[0][0].freeScooter(new Location(0,0));
+        grid[0][0].freeScooter(new Location(0,0));
         grid[0][0].freeScooter(new Location(0,0));
         grid[0][0].freeScooter(new Location(0,0));
         grid[1][1].freeScooter(new Location(6,6));
         grid[1][1].freeScooter(new Location(6,6));
-        grid[1][1].freeScooter(new Location(6,6));*/
-        for(int i = 0; i < numberScooters; i++) {
+        grid[1][1].freeScooter(new Location(6,6));
+        /*for(int i = 0; i < numberScooters; i++) {
             int x = r.nextInt(ServerFacade.N);
             int y = r.nextInt(ServerFacade.N);
             Location l = new Location(x, y);
             Location chunkIndex = getChunkIndex(l);
             grid[chunkIndex.getX()][chunkIndex.getY()].freeScooter(l);
-        }
+        }*/
     }
 }

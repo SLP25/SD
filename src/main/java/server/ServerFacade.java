@@ -162,6 +162,7 @@ public class ServerFacade {
         int cost = -1;
         Reservation r;
         reservations.readLock().lock();
+        rewards.writeLock().lock();
         try {
             r = reservations.getReservation(id);
             if(r != null) {
@@ -174,6 +175,13 @@ public class ServerFacade {
                     if(r.getUser().equals(user) && !r.hasTerminated()) {
                         r.terminate(location);
                         cost = r.getCost();
+
+                        Reward rw = rewards.isApplicable(r.getStartLocation(), r.getEndLocation());
+
+                        if(rw != null) {
+                            cost -= rw.getMoney();
+                            rewards.remove(rw);
+                        }
 
                         scooters.lockLocation(location, true);
                         try {
@@ -191,6 +199,7 @@ public class ServerFacade {
             return cost;
         } finally {
             reservations.readLock().unlock();
+            rewards.writeLock().unlock();
         }
     }
 

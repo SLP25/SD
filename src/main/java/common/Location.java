@@ -133,6 +133,18 @@ public final class Location implements Comparable<Location> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if(o == null)
+            return false;
+
+        if(!(o instanceof Location))
+            return false;
+
+        Location l = (Location)o;
+
+        return l.getX() == this.getX() && l.getY() == this.getY();
+    }
+    @Override
     public String toString() {
         return String.format("(%d,%d)", x, y);
     }

@@ -51,7 +51,8 @@ public class CommandLine {
             }
         } catch (InstantiationException
                  | NoSuchMethodException
-                 | IllegalAccessException e) {
+                 | IllegalAccessException
+                 | ArrayIndexOutOfBoundsException e) {
             Output.showln("Invalid Option");
         } catch( InvocationTargetException e) {
             Output.showln(e.getTargetException().getMessage());

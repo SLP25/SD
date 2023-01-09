@@ -3,6 +3,7 @@ package common;
 import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.util.Comparator;
 
 /**
  * A reward (monetary) for moving a scooter from one location to another.

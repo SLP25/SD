@@ -4,6 +4,7 @@ import client.exceptions.NotAuthenticatedException;
 import common.*;
 import common.messages.*;
 import utils.Pair;
+import view.Output;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.util.Map;
 
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.function.Consumer;
 
 //TODO:: Refactor to common interface with server facade
 /**
@@ -51,7 +52,6 @@ public class Client implements IClient {
 
         LoginResponse response = (LoginResponse)conn.receive(1);
 
-
         return response.getUser();
     }
 
@@ -77,12 +77,27 @@ public class Client implements IClient {
      * Default constructor
      * @throws IOException if creating the socket to the server failed
      */
-    public Client() throws IOException {
+    public Client(Consumer<Notification> processNotification) throws IOException {
         common.ClassLoader.loadClasses(Message.class.getPackage().getName(),
                 Arrays.asList(new String[]{"Message", "Exception"}));
         Socket clientSocket = new Socket(ip, port);
         conn = new Demultiplexer(new TaggedConnection(clientSocket));
         conn.start();
+
+
+        new Thread(() -> {
+            while(true) {
+                try {
+                    Message msg = conn.receive(2);
+                    RewardNotification not = (RewardNotification)msg;
+                    processNotification.accept(not.getNotification());
+                } catch (EOFException | InterruptedException e) {
+                    return; //End of notifications
+                } catch (IOException e) {
+                    System.out.println("Error receiving notifications");
+                }
+            }
+        }).start();
     }
 
     /**
@@ -159,21 +174,6 @@ public class Client implements IClient {
     public void startNotifications() throws IOException {
         SendNotificationsRequest request = new SendNotificationsRequest();
         conn.send(2, request);
-
-        new Thread(() -> {
-            while(true) {
-                try {
-                    Message msg = conn.receive(2);
-                    RewardNotification not = (RewardNotification)msg;
-                    for(Reward r : not.getNotification().getRewards())
-                        System.out.println(r.toString());
-                } catch (EOFException | InterruptedException e) {
-                    return; //End of notifications
-                } catch (IOException e) {
-                    System.out.println("Error receiving notifications");
-                }
-            }
-        }).start();
     }
 
     public void stopNotifications() throws IOException {

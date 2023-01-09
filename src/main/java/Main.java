@@ -1,6 +1,8 @@
 import client.Client;
 import client.IClient;
+import common.Reward;
 import view.CommandLine;
+import view.Output;
 
 import java.io.IOException;
 
@@ -16,7 +18,10 @@ public class Main {
     public static void main(String[] args) {
         CommandLine commandLine = new CommandLine();
         try {
-            IClient client = new Client();
+            IClient client = new Client((not) -> {
+                for(Reward r : not.getRewards())
+                    Output.showln(r.toString());
+            });
             commandLine.shell(IClient.class, client);
         } catch(IOException e) {
             System.out.println("Could not connect to server. Terminating");

@@ -33,7 +33,7 @@ public class Chunk extends LockableCollection {
      */
     public Chunk(Location tl) {
         topLeftCorner = tl;
-        scooters = new HashMap<>();
+        scooters = new TreeMap<>();
     }
 
     /**

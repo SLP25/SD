@@ -4,6 +4,7 @@ import common.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The server facade. Exposes all the supported functionality
@@ -119,6 +120,17 @@ public class ServerFacade {
             return ans;
         } finally {
             scooters.unlockLocation(location, false);
+        }
+    }
+
+    public Set<Reward> getRewardsInDistance(Location location) {
+        rewards.readLock().lock();
+        try {
+            return rewards.getRewards().stream()
+                    .filter(r -> Location.distance(location, r.getStartLocation()) <= D)
+                    .collect(Collectors.toSet());
+        } finally {
+            rewards.readLock().unlock();
         }
     }
 

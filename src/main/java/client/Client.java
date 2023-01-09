@@ -4,7 +4,6 @@ import client.exceptions.NotAuthenticatedException;
 import common.*;
 import common.messages.*;
 import utils.Pair;
-import view.Output;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -12,6 +11,7 @@ import java.util.Map;
 
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.function.Consumer;
 
 //TODO:: Refactor to common interface with server facade
@@ -121,6 +121,29 @@ public class Client implements IClient {
         FreeScootersWithinDistanceResponse response = (FreeScootersWithinDistanceResponse)msg;
 
         return response.getScooters();
+    }
+
+    /**
+     * Gets all rewards within a certain distance of the given location
+     *
+     * @return all rewards within a certain distance of the given location
+     * @throws IOException if connecting with the server failed
+     * @throws InterruptedException if the thread is interrupted
+     */
+    public Set<Reward> getRewardsInDistance(Integer x, Integer y)
+            throws IOException, InterruptedException, NotAuthenticatedException {
+
+        Location location = new Location(x, y);
+
+        RewardsWithinDistanceRequest request = new RewardsWithinDistanceRequest(location);
+
+        conn.send(1, request);
+
+        Message msg = conn.receive(1);
+        assertAuthenticated(msg);
+        RewardsWithinDistanceResponse response = (RewardsWithinDistanceResponse)msg;
+
+        return response.getRewards();
     }
 
     /**

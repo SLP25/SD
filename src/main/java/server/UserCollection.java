@@ -83,45 +83,13 @@ public class UserCollection {
     }
 
     /**
-     * Seeds the collection with data from a file.
-     *
+     * Seeds the collection with hardcoded accounts (to speed up testing and debugging)
      * Runs on startup
      */
-    //TODO: Throw exception
     private void seedData() {
-        //I will propably be killed for this // nice one g
-        final String filePath = "./data/users.txt";
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(filePath));
-            String line = reader.readLine();
-
-            while (line != null) {
-                processFileLine(line);
-                line = reader.readLine();
-            }
-            reader.close();
-        } catch(IOException e) {
-            System.out.println(e.getStackTrace().toString());
-        }
-    }
-
-    /**
-     * Auxiliary method of {@link, #seedData()}. Processes a single line of the file
-     * containing the users.
-     *
-     * A line should have the format "username:password". Anything else will be deemed
-     * invalid.
-     *
-     * @param line a line of the text file
-     * @throws IOException if the line is not valid
-     */
-    private void processFileLine(String line) throws IOException {
-        String[] split = line.split(":");
-
-        if(split.length != 2) {
-            throw new IOException("Invalid data");
-        } else {
-            registerUser(split[0], split[1]);
-        }
+        registerUser("bace", "password1234");
+        registerUser("vasques", "password1234");
+        registerUser("felicio", "password1234");
+        registerUser("luis", "password1234");
     }
 }

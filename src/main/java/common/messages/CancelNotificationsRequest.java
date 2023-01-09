@@ -17,6 +17,6 @@ public class CancelNotificationsRequest extends Message {
 
     @Override
     protected Message deserializeMessage(DataInputStream in) throws IOException {
-        return null;
+        return new CancelNotificationsRequest();
     }
 }

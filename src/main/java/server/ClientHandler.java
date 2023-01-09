@@ -123,6 +123,7 @@ public class ClientHandler implements Runnable {
                         state.connection.send(f.getTag(), response);
                 }
             } while (curMessage != null);
+            System.out.println("Client sent null message. Disconnecting...");
         } catch(EOFException e) {
             System.out.println("Client disconnected");
         } catch(IOException e) {

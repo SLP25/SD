@@ -19,6 +19,13 @@ public class ServerFacade {
      */
     public static int D;
 
+    //LOCK ORDERING: reservations -> scooters -> rewards
+
+    /**
+     * The collection of reservations
+     */
+    private final ReservationCollection reservations;
+
     /**
      * The collection of rewards
      */
@@ -28,11 +35,6 @@ public class ServerFacade {
      * The collection of scooters
      */
     private final ScooterCollection scooters;
-
-    /**
-     * The collection of reservations
-     */
-    private final ReservationCollection reservations;
 
     /**
      * The collection of users
@@ -71,8 +73,8 @@ public class ServerFacade {
     }
 
     /**
-     * Gets the subscription to the
-     * @param r the method used to trigger reward generation
+     * Gets the subscription to the notifications queue
+     * @return The subscription
      */
     public SubscribableQueue<Notification>.Subscription getRewardSubscription() {
         return this.rewards.getSubscription();
@@ -131,17 +133,20 @@ public class ServerFacade {
      */
     public Reservation reserveScooter(String user, Location location) {
 
-        scooters.lockLocation(location, true);
         reservations.writeLock().lock();
+        scooters.lockLocation(location, true);
         try  {
-            Location l = scooters.reserveScooter(location);
-            Reservation ans = new Reservation(reservations.getNumberReservations(),
-                    user, l, LocalDateTime.now());
+            Location l;
+            try {
+                l = scooters.reserveScooter(location);
+            } finally {
+                scooters.unlockLocation(location, true);
+            }
+            Reservation ans = new Reservation(reservations.getNumberReservations(), user, l, LocalDateTime.now());
             reservations.addReservation(ans);
             runRewards.run();
             return ans;
         } finally {
-            scooters.unlockLocation(location, true);
             reservations.writeLock().unlock();
         }
     }
@@ -155,33 +160,36 @@ public class ServerFacade {
      */
     public int endReservation(String user, int id, Location location) {
         int cost = -1;
+        Reservation r;
         reservations.readLock().lock();
-        Reservation r = reservations.getReservation(id);
-        if(r != null) {
-            r.lock();
+        try {
+            r = reservations.getReservation(id);
+            if(r != null) {
+                r.lock();
 
-            //Only the user who started the reservation can end it
-            if(r.getUser().equals(user)) {
-                r.terminate(location);
-                cost = r.getCost();
+                try {
+                    //Only the user who started the reservation can end it
+                    if(r.getUser().equals(user)) {
+                        r.terminate(location);
+                        cost = r.getCost();
 
-                scooters.lockLocation(location, true);
-                try  {
-                    scooters.freeScooter(location);
+                        scooters.lockLocation(location, true);
+                        try {
+                            scooters.freeScooter(location);
+                        } finally {
+                            scooters.unlockLocation(location, true);
+                        }
+
+                        runRewards.run();
+                    }
                 } finally {
-                    scooters.unlockLocation(location, true);
+                    r.unlock();
                 }
             }
-
-            r.unlock();
+            return cost;
+        } finally {
+            reservations.readLock().unlock();
         }
-
-
-        reservations.readLock().unlock();
-
-        runRewards.run();
-
-        return cost;
     }
 
     /**
@@ -198,28 +206,29 @@ public class ServerFacade {
         scooters.lockEverything(false);
         rewards.writeLock().lock();
         try {
-            Map<Location, Integer> sc = scooters.getAllScooters();
-            for(Map.Entry<Location, Integer> kv: sc.entrySet()) {
-                if(kv.getValue() > 1) {
-                    fullLocations.add(kv.getKey());
-                }
-            }
-
-            int n = ServerFacade.N;
-
-            for(int i = 0; i < N; i++) {
-                for(int j = 0; j < N; j++) {
-                    if(scooters.getFreeScootersInRange(new Location(i,j)).size() == 0) {
-                        emptyLocations.add(new Location(i,j));
+            try {
+                Map<Location, Integer> sc = scooters.getAllScooters();
+                for(Map.Entry<Location, Integer> kv: sc.entrySet()) {
+                    if(kv.getValue() > 1) {
+                        fullLocations.add(kv.getKey());
                     }
                 }
+
+                for(int i = 0; i < N; i++) {
+                    for(int j = 0; j < N; j++) {
+                        if(scooters.getFreeScootersInRange(new Location(i,j)).size() == 0) {
+                            emptyLocations.add(new Location(i,j));
+                        }
+                    }
+                }
+            } finally {
+                scooters.unlockEverything(false);
             }
 
             Set<Reward> r = generateRewards(emptyLocations, fullLocations);
             rewards.replaceAll(r);
             System.out.println("Generated " + rewards.size() + " rewards");
         } finally {
-            scooters.unlockEverything(false);
             rewards.writeLock().unlock();
         }
     }

@@ -253,11 +253,18 @@ public class ScooterCollection extends LockableCollection {
     private void seedScooters(int numberScooters) {
         Random r = new Random();
         for(int i = 0; i < numberScooters; i++) {
-            int x = r.nextInt(ServerFacade.N);
+            /*int x = r.nextInt(ServerFacade.N);
             int y = r.nextInt(ServerFacade.N);
             Location l = new Location(x, y);
             Location chunkIndex = getChunkIndex(l);
-            grid[chunkIndex.getX()][chunkIndex.getY()].freeScooter(l);
+            grid[chunkIndex.getX()][chunkIndex.getY()].freeScooter(l);*/
+
+            grid[0][0].freeScooter(new Location(0,0));
+            grid[0][0].freeScooter(new Location(0,0));
+            grid[0][0].freeScooter(new Location(0,0));
+            grid[1][1].freeScooter(new Location(6,6));
+            grid[1][1].freeScooter(new Location(6,6));
+            grid[1][1].freeScooter(new Location(6,6));
         }
     }
 }

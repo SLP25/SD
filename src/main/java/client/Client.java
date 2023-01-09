@@ -5,6 +5,7 @@ import common.*;
 import common.messages.*;
 import utils.Pair;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -161,19 +162,17 @@ public class Client implements IClient {
         conn.send(2, request);
 
         new Thread(() -> {
-            while(true) {//TODO:: Signal end of notifications
+            while(true) {
                 try {
                     Message msg = conn.receive(2);
                     RewardNotification not = (RewardNotification)msg;
-                    for(Reward r : not.getNotification().getRewards()) {
+                    for(Reward r : not.getNotification().getRewards())
                         System.out.println(r.toString());
-                    }
+                } catch (EOFException | InterruptedException e) {
+                    return; //End of notifications
                 } catch (IOException e) {
                     System.out.println("Error receiving notifications");
-                } catch (InterruptedException e) {
-
                 }
-
             }
         }).start();
     }

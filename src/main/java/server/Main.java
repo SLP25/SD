@@ -28,18 +28,18 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         loadClasses();
-        int n = 0, d = 0, scooters = 0;
+        int n, d, scooters;
         try {
             n = Integer.valueOf(args[0]);
             d = Integer.valueOf(args[1]);
             scooters = Integer.valueOf(args[2]);
-        } catch(Exception e) {
-            System.out.println("Invalid arguments. Terminating");
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            System.out.println("Invalid arguments. Expected 3 integers N, D and SCOOTERS. Terminating");
             return;
         }
 
-        if(d == 0 || n % d != 0) {
-            System.out.println("Invalid arguments: D must be a divisor of N");
+        if(d == 0 || n % (2*d) != 0) {
+            System.out.println("Invalid arguments: 2*D must be a divisor of N");
             return;
         }
 
